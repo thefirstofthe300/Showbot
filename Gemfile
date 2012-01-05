@@ -26,6 +26,7 @@ gem 'coffee-script'
 gem 'execjs'
 gem 'therubyracer'
 gem 'eat'
+gem 'json'
 
 # Showbot Specific
 gem 'cinch'

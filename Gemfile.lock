@@ -319,6 +319,7 @@ DEPENDENCIES
   htmlentities
   i18n
   irbtools-more
+  json
   mail (~> 2.5.0)
   net-ssh (>= 2.3.0, <= 2.5.2)
   rack-test
