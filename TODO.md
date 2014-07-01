@@ -1,6 +1,6 @@
 # TODO
 
-Ranked by diffulty to implement, ordered within those ranking by priority to implement:
+Ranked by difficulty to implement, ordered within those ranking by priority to implement:
 
 Easy
 ---------
