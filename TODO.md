@@ -4,7 +4,7 @@ Ranked by difficulty to implement, ordered within those ranking by priority to i
 
 Easy
 ---------
-* Correct htmlentities parsing in the twitter module.
+* ~~Correctly parse html entities in the twitter plugin.~~ <sup>Done for 2.0</sup>
 * Clean up the stdout output to make it more readable.
 * Add a !linuxgames to get a count of the number of linux games available on steam either dynamically via the storefront API or by perhaps using https://github.com/SteamDatabase/SteamLinux
 
