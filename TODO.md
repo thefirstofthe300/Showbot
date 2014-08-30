@@ -29,4 +29,4 @@ Time Consuming
 * Redo the voting system to not be tied to IP so multiple people on the same connection can vote.
 * Add an IRC authentication interface for controlling restricted commands via the IRC.
 	* Add a plugin that allows the addition/removal of arbitrary commands when that is implemented.
-*Research and implement a CM system(Chef, Puppet, Ansible, etc) for easy deployment.
+* Research and implement a CM system(Chef, Puppet, Ansible, etc) for easy deployment.
