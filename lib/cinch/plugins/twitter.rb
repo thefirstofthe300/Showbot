@@ -2,8 +2,9 @@
 
 require 'chronic_duration'
 require 'twitter'
-        
-module Cinch	
+require 'htmlentities'
+
+module Cinch
   module Plugins
     class Twitter
       include Cinch::Plugin
@@ -22,6 +23,7 @@ module Cinch
       def initialize(*args)
         super
 
+        @entity = HTMLEntities.new
         @user = config[:twitter_user]
         @channel = config[:channel]
         @channel_test = config[:channel_test]
@@ -39,8 +41,15 @@ module Cinch
           created_at = status.created_at.to_datetime
           seconds_ago = (Time.now - created_at.to_time).to_i
           relative_time = ChronicDuration.output(seconds_ago, :format => :long)
+          status_text = status.text
+          status_decoded = nil
 
-          return "@#{@twitter_laststatus_user}: #{status.text} (#{relative_time} ago)"
+          while status_text != status_decoded
+            status_decoded = status_text
+            status_text = @entity.decode(status_text)
+          end
+
+          return "@#{@twitter_laststatus_user}: #{status_text} (#{relative_time} ago)"
         end
       end
 
@@ -56,6 +65,7 @@ module Cinch
           end
         end
       end
+
 
       def send_last_status
         @user.each do |z|
@@ -95,8 +105,16 @@ module Cinch
             created_at = status.created_at.to_datetime
             seconds_ago = (Time.now - created_at.to_time).to_i
             relative_time = ChronicDuration.output(seconds_ago, :format => :long)
+            status_text = status.text
+            status_decoded = nil
 
-            return "@#{@twitter_user}: #{status.text} (#{relative_time} ago)"
+            while status_text != status_decoded
+              status_decoded = status_text
+              status_text = @entity.decode(status_text)
+            end
+
+
+            return "@#{@twitter_user}: #{status_text} (#{relative_time} ago)"
           end
         end
       end
