@@ -48,12 +48,12 @@ module Cinch
           time_string = time.strftime("%-I:%M%P EST")
           nearest_seconds_until = ((next_event.start_time - DateTime.now) * 24 * 60 * 60).to_i
           if show
-            m.user.send "The next #{next_event.summary} is in #{ChronicDuration.output(nearest_seconds_until, :format => :long)} (#{time_string} on #{date_string})"
+            m.reply "The next #{next_event.summary} is in #{ChronicDuration.output(nearest_seconds_until, :format => :long)} (#{time_string} on #{date_string})"
           else
-            m.user.send "Next show is #{next_event.summary} in #{ChronicDuration.output(nearest_seconds_until, :format => :long)} (#{time_string} on #{date_string})"
+            m.reply "Next show is #{next_event.summary} in #{ChronicDuration.output(nearest_seconds_until, :format => :long)} (#{time_string} on #{date_string})"
           end
         else
-          m.user.send "No upcoming show found for #{show.title}"
+          m.reply "No upcoming show found for #{show.title}"
         end
 
       end
