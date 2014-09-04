@@ -1,6 +1,7 @@
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 
 # Regular
+gem 'activesupport', '<= 3.2.16'
 gem 'tzinfo'
 gem 'tzinfo-data'
 gem 'i18n'
@@ -23,6 +24,7 @@ gem 'sass'
 gem 'coffee-script'
 gem 'execjs'
 gem 'therubyracer'
+gem 'eat'
 
 # Showbot Specific
 gem 'cinch'
@@ -31,6 +33,7 @@ gem 'chronic'
 gem 'chronic_duration'
 gem 'ri_cal'
 gem 'twitter'
+gem 'htmlentities'
 gem 'cinch-identify'
 gem 'stopwords', '0.2'
 
