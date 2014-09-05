@@ -31,3 +31,4 @@ Time Consuming
 - [ ] Add an IRC authentication interface for controlling restricted commands via the IRC
  - [ ] Add a plugin that allows the addition/removal of arbitrary commands when that is implemented
 - [ ] Research and implement a CM system(Chef, Puppet, Ansible, etc) for easy deployment
+- [ ] Make the vote page update asynchronously (aka AJAX ALL THE THINGS)
