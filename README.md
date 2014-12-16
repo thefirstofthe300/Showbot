@@ -1,15 +1,8 @@
-# Showbot
+# JBot
 
-A sweet IRC bot with a **web interface** for [5by5](http://5by5.tv).
-Built on [cinch](https://github.com/cinchrb/cinch) and [sinatra](http://www.sinatrarb.com/).
-
-## Showbot on the Internets
-
-[Showbot's Stats on GitEgo](http://gitego.com/mutewinter/Showbot)
-
-[The Creation of Showbot](http://pileofturtles.com/2011/07/showbot/)
-
-[Showbot.me](http://showbot.me)
+A sweet IRC bot with a **web interface** for [Jupiter Broadcasting](http://www.jupiterbroadcasting.com/).
+Built on [cinch](https://github.com/cinchrb/cinch) and [sinatra](http://www.sinatrarb.com/). It is a fork/evolution of
+Showbot, built for 5by5.
 
 ## IRC Commands
 
@@ -17,9 +10,9 @@ Built on [cinch](https://github.com/cinchrb/cinch) and [sinatra](http://www.sina
 * !schedule - What shows are being recorded live in the next seven days?
 * !suggest - Be heard. Suggest a title for the live show.
 * !link - Know the link for that? Suggest it and make the show better.
-* !current - What's playing on 5by5.tv/live? I've got you covered.
-* !last_status - The last tweet by @5by5, delivered to you in IRC. Sweet.
-* !about - Was showbot coded or did it spontaneously come into existence?
+* !current - What's playing on jblive.tv? I've got you covered.
+* !last_status - The last tweet by @ChrisLAS, delivered to you in IRC. Sweet.
+* !about - Was JBot coded or did it spontaneously come into existence?
 * !help - Uh, this.
 
 ## Setup and Customization
@@ -33,7 +26,7 @@ Built on [cinch](https://github.com/cinchrb/cinch) and [sinatra](http://www.sina
 
 These commands will get you setup to run Showbot.
 
- * `git clone https://github.com/mutewinter/Showbot.git`
+ * `git clone https://github.com/rikai/Showbot.git`
  * `cd Showbot`
  * `bundle`
  * `foreman run rake db:migrate`
@@ -81,8 +74,8 @@ DATA_JSON_URL=your_info_here
  * Customize [`cinchize.yml`][cinchize] for your IRC channel.
  * Update [`fix_name`][fix_name] to match your bot's name.
 
-[cinchize]: https://github.com/mutewinter/Showbot/blob/master/cinchize.yml
-[fix_name]: https://github.com/mutewinter/Showbot/blob/master/lib/cinch/plugins/showbot_admin.rb#L54
+[cinchize]: https://github.com/rikai/Showbot/blob/master/cinchize.yml
+[fix_name]: https://github.com/rikai/Showbot/blob/master/lib/cinch/plugins/showbot_admin.rb#L54
 
 ### data.json
 
@@ -96,9 +89,9 @@ to start by removing the [before create hook][hook] in `suggestion.rb`. To avoid
 the "Show Not Listed" message you'll want to remove the suggestion set break in
 [`_table_set.haml`][table_set] and [`_bubble_set.haml`][bubble_set].
 
-[hook]: https://github.com/mutewinter/Showbot/blob/master/lib/models/suggestion.rb#L45
-[table_set]: https://github.com/mutewinter/Showbot/blob/master/views/suggestion/_table_set.haml#L4
-[bubble_set]: https://github.com/mutewinter/Showbot/blob/master/views/suggestion/_bubble_set.haml#L3
+[hook]: https://github.com/rikai/Showbot/blob/master/lib/models/suggestion.rb#L45
+[table_set]: https://github.com/rikai/Showbot/blob/master/views/suggestion/_table_set.haml#L4
+[bubble_set]: https://github.com/rikai/Showbot/blob/master/views/suggestion/_bubble_set.haml#L3
 
 ### Modifying the CSS
 
@@ -108,10 +101,10 @@ overwritten with any changes that are made in `showbot.scss`. This annoying
 setup is necessary due to [Bourbon](https://github.com/thoughtbot/bourbon) not
 working well outside of the Rails asset pipeline.
 
-[showbot_scss]: https://github.com/mutewinter/Showbot/blob/master/sass/showbot.scss
+[showbot_scss]: https://github.com/rikai/Showbot/blob/master/sass/showbot.scss
 
 ### Data.json
-
+<!-- FIXME: CORRECT THIS TO MATCH THE CURRENT IMPLEMENTATION -->
 5by5.tv uses a JSON API to provide details about which show is live. When a
 title is suggested, this JSON API is queried and the show that the title was
 suggested during is attached to the suggestion.
@@ -156,27 +149,7 @@ $ bundle exec foreman start irc -f Procfile.local
  * To [gouwens](https://github.com/gouwens) for implementing the clustered
    view.
 
-## License
+## JBot on the Internets
 
-The MIT License
-
-Copyright (c) 2011 Jeremy Mack, Pile of Turtles, LLC
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+[The Creation of Showbot](http://pileofturtles.com/2011/07/showbot/)
 
