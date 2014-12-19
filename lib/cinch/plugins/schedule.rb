@@ -52,8 +52,10 @@ module Cinch
           else
             m.reply "Next show is #{next_event.summary} in #{ChronicDuration.output(nearest_seconds_until, :format => :long)} (#{time_string} on #{date_string})"
           end
-        else
+        elsif show
           m.reply "No upcoming show found for #{show.title}"
+        else
+          m.reply "No upcoming show found"
         end
 
       end
