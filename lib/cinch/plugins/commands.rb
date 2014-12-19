@@ -25,7 +25,7 @@ module Cinch
           "!suggest - Be heard. Suggest a title for the live show.",
           "!link - Know the link for that? Suggest it and make the show better.",
           "!current - What's playing on #{shared[:Live_Url]}? I've got you covered.",
-          "!last_status - The last tweet by @#{shared[:Twitter_User].join(", @")} delievered to you in IRC. Sweet.",
+          "!last_status - The last tweet by @#{Array(shared[:Twitter_User]).join(", @")} delievered to you in IRC. Sweet.",
           "!bittick - Meta-command for the bitcoin commands",
           "!bitavg - Bitcoin averages from bitcoinaveages.com",
           "!goxtick - Bitcoin Ticker (MtGox)",
