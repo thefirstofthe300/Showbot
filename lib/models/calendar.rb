@@ -1,28 +1,21 @@
 require 'google/api_client'
 
 module Calendar
-  CWD = Dir.pwd # This needs to be here, or else it doesn't correctly get the cwd
-
   # Create a new Calendar object, here a GoogleCalendar object
   def self.new(config = {})
     google_config = {
       :app_name => config[:app_name],
       :app_version => config[:app_version],
       :calendar_id => config[:calendar_id],
-      :service_email => config[:service_email],
-      :key_file => "#{CWD}/#{config[:key_file]}" # Get key file relative to app root
+      :api_key => config[:api_key]
     }
 
     google_client = Google::APIClient.new(
       :application_name => google_config[:app_name],
-      :application_version => google_config[:app_version]
+      :application_version => google_config[:app_version],
+      :key => google_config[:api_key],
+      :authorization => nil
     )
-
-    key = Google::APIClient::PKCS12.load_key(google_config[:key_file], 'notasecret')
-    asserter = Google::APIClient::JWTAsserter.new(google_config[:service_email], [
-      'https://www.googleapis.com/auth/calendar.readonly'
-    ], key)
-    google_client.authorization = asserter.authorize()
 
     google_api = google_client.discovered_api('calendar', 'v3')
 
@@ -44,6 +37,7 @@ module Calendar
     def events
       results = @client.execute(
         :api_method => @calendar.events.list,
+        :authenticated => false,
         :parameters => {
           'calendarId' => @config[:calendar_id],
           'fields' => 'items(start,summary)',

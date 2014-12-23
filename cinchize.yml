@@ -22,9 +22,7 @@ plugins: &plugins
     options: # Customize these options to match your configuration
       :app_name: 'JBot'
       :app_version: '2.0.0'
-      :calendar_id: 'examplecalendar@group.calendar.google.com'
-      :service_email: 'example-email@developer.gserviceaccount.com'
-      :key_file: 'example-keyfile.p12' # Provide the path to your key file, relative to the working directory of the app
+      :api_key: 'YOURAPIKEYHERE'
   -
     class: "Cinch::Plugins::Suggestions"
   -
