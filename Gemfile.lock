@@ -1,19 +1,3 @@
-GIT
-  remote: git://github.com/sferik/twitter.git
-  revision: bf32ee8c040aa6299e983fcfa92e78ecef2af5ed
-  specs:
-    twitter (5.9.0)
-      addressable (~> 2.3)
-      buftok (~> 0.2.0)
-      equalizer (~> 0.0.9)
-      faraday (~> 0.9.0)
-      http (~> 0.6.0)
-      http_parser.rb (~> 0.6.0)
-      json (~> 1.8)
-      memoizable (~> 0.4.0)
-      naught (~> 1.0)
-      simple_oauth (~> 0.2.0)
-
 GEM
   remote: http://rubygems.org/
   specs:
@@ -22,6 +6,10 @@ GEM
       multi_json (~> 1.0)
     addressable (2.3.6)
     alias (0.2.3)
+    autoparse (0.3.3)
+      addressable (>= 2.3.1)
+      extlib (>= 0.9.15)
+      multi_json (>= 1.0.0)
     awesome_print (1.2.0)
     backports (3.6.0)
     backup (3.4.0)
@@ -122,6 +110,7 @@ GEM
     every_day_irb (1.6.1)
     excon (0.17.0)
     execjs (2.0.2)
+    extlib (0.9.16)
     fancy_irb (0.7.3)
       paint (>= 0.8.1)
       unicode-display_width (>= 0.1.1)
@@ -144,11 +133,21 @@ GEM
       thor (~> 0.19.1)
     formatador (0.2.4)
     g (1.7.2)
+    google-api-client (0.8.1)
+      activesupport (>= 3.2)
+      addressable (~> 2.3)
+      autoparse (~> 0.3)
+      extlib (~> 0.9)
+      faraday (~> 0.9)
+      launchy (~> 2.4)
+      multi_json (~> 1.10)
+      retriable (~> 1.4)
+      signet (~> 0.6)
     haml (4.0.5)
       tilt
     hirb (0.7.1)
     htmlentities (4.3.2)
-    http (0.6.1)
+    http (0.6.3)
       http_parser.rb (~> 0.6.0)
     http_parser.rb (0.6.0)
     httpclient (2.3.4.1)
@@ -186,6 +185,9 @@ GEM
       looksee (~> 2.0)
     json (1.8.1)
     json_pure (1.8.1)
+    jwt (1.2.0)
+    launchy (2.4.3)
+      addressable (~> 2.3)
     libv8 (3.11.8.17)
     looksee (2.1.0)
     mail (2.5.4)
@@ -218,13 +220,19 @@ GEM
     rake (10.3.1)
     rb-fsevent (0.9.4)
     ref (1.0.5)
-    ri_cal (0.8.8)
+    retriable (1.4.1)
     ruby-hmac (0.4.0)
     ruby_engine (1.0.1)
     ruby_info (1.0.1)
     ruby_version (1.0.1)
     sass (3.3.7)
-    simple_oauth (0.2.0)
+    signet (0.6.0)
+      addressable (~> 2.3)
+      extlib (~> 0.9)
+      faraday (~> 0.9)
+      jwt (~> 1.0)
+      multi_json (~> 1.10)
+    simple_oauth (0.3.0)
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -255,6 +263,17 @@ GEM
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
+    twitter (5.13.0)
+      addressable (~> 2.3)
+      buftok (~> 0.2.0)
+      equalizer (~> 0.0.9)
+      faraday (~> 0.9.0)
+      http (~> 0.6.0)
+      http_parser.rb (~> 0.6.0)
+      json (~> 1.8)
+      memoizable (~> 0.4.0)
+      naught (~> 1.0)
+      simple_oauth (~> 0.3.0)
     tzinfo (1.1.0)
       thread_safe (~> 0.1)
     tzinfo-data (1.2014.3)
@@ -294,6 +313,7 @@ DEPENDENCIES
   execjs
   fog (~> 1.9.0)
   foreman
+  google-api-client
   haml
   htmlentities
   i18n
@@ -303,14 +323,13 @@ DEPENDENCIES
   rack-test
   rake
   rb-fsevent
-  ri_cal
   sass
   sinatra
   sinatra-reloader
   stopwords (= 0.2)
   therubyracer
   thin
-  twitter!
+  twitter
   tzinfo
   tzinfo-data
   whenever
