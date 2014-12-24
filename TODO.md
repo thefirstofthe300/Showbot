@@ -10,8 +10,8 @@ Easy
 
 Moderate
 ---------
-- [ ] Fix bug in current scheduling system that sometimes gets the show dates wrongly because some ical flags are being ignored (possibly an upstream bug that needs to be addressed) - [Issue #4](https://github.com/rikai/Showbot/issues/4)
- - [ ] Actual solution might be to replace ri_cal, see third option in the next section.
+- [x] Fix bug in current scheduling system that sometimes gets the show dates wrongly because some ical flags are being ignored (possibly an upstream bug that needs to be addressed) - [Issue #4](https://github.com/rikai/Showbot/issues/4)
+ - [x] Actual solution might be to replace ri_cal, see third option in the next section.
 - [ ] Remove the dependency on therubyracer
  - [ ] one of the other execjs alternatives may work, just needs some testing to ensure there are no issues
 - [x] Add the ability to hot-reload plugins without restarting JBot
