@@ -23,7 +23,7 @@ Time Consuming
 
 - [x] Update to work with ruby 2.x
 - [ ] Write a small web frontend with user accounts to control data.json and and/remove from shows.json
-- [ ] Convert schedule system to using the gdata API for reading calendars rather than scraping ics with ri_cal
+- [x] Convert schedule system to using the gdata API for reading calendars rather than scraping ics with ri_cal
 - [ ] Convert the twitter module to the streaming API instead of polling
 - [ ] Add a Youtube module to push release notices to the IRC channel
 - [ ] Add a RSS module to push JB site releases to the IRC channel
