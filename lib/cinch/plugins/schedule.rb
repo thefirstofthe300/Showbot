@@ -1,5 +1,4 @@
 require 'chronic_duration'
-require 'tzdata'
 require './lib/models/shows'
 require './lib/models/calendar'
 
