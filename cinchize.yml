@@ -23,6 +23,7 @@ plugins: &plugins
       :app_name: 'JBot'
       :app_version: '2.0.0'
       :api_key: 'YOURAPIKEYHERE'
+      :calendar_id: 'CALENDARIDHERE@group.calendar.google.com'
   -
     class: "Cinch::Plugins::Suggestions"
   -
