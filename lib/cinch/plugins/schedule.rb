@@ -45,9 +45,9 @@ module Cinch
 
           m.reply response
         elsif show
-          m.reply "No upcoming show found for #{show.title}"
+          m.reply "No upcoming show found for #{show.title} in the next week"
         else
-          m.reply "No upcoming show found"
+          m.reply "No upcoming show found in the next week"
         end
 
       end
