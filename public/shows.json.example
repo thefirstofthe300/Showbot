@@ -1,0 +1,11 @@
+{"shows": [
+	{
+		"rss": "RSSFEED",
+		"url": "SHOWSLUG",
+		"title": "TITLE USED IN CALENDAR",
+		"aliases": [
+			"ALIASES FOR SEARCHING",
+			"aliases is optional"
+		]
+	}
+]}

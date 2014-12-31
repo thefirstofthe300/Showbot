@@ -2,12 +2,11 @@
 
 require 'json'
 
-SHOWS_JSON = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "public", "shows.json"))
+require './lib/models/show.rb'
 
-require File.expand_path(File.join(File.dirname(__FILE__), "show"))
+SHOWS_JSON = "#{Dir.pwd}/public/shows.json"
 
 class Shows
-
   # The array of shows loaded from the SHOWS_JSON file
   def self.shows
     if not defined? @@shows_array
@@ -26,9 +25,7 @@ class Shows
   def self.find_show(keyword)
     if keyword
       self.shows.each do |show|
-        if show.url.downcase == keyword.downcase
-          return show
-        elsif show.title.downcase.include? keyword.downcase
+        if show.matches? keyword
           return show
         end
       end
