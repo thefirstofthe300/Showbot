@@ -6,6 +6,7 @@ gem 'tzinfo'
 gem 'tzinfo-data'
 gem 'i18n'
 gem 'rake'
+gem 'dotenv'
 
 # Backups
 gem 'backup'
