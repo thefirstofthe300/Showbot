@@ -45,6 +45,7 @@ class Shows
   end
 
   # Get the live show slug
+  # TODO: Figure out how to deal with this properly if it is nil instead of erroring out.
   def self.fetch_live_show_slug
     slug = nil
 
