@@ -80,6 +80,8 @@ module Cinch
           @events.select do |event|
             event.summary.start_with? show.title
           end
+        end.select do |event|
+          event.start_time > Time.now
         end.first
       end
 
