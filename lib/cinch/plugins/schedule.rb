@@ -9,7 +9,8 @@ module Cinch
 
       timer 600, :method => :refresh_calendar
 
-      match /next\s?(.*)/i,     :method => :command_next      # !next
+      match /next\s*$/i,        :method => :command_next      # !next
+      match /next\s+(.*)/i,     :method => :command_next_show # !next <show>
       match /schedule\s?(.*)/i, :method => :command_schedule  # !schedule
 
       def initialize(*args)
@@ -26,30 +27,59 @@ module Cinch
       end
 
       # Replies to the user with information about the next show
-      # !next b2w -> The next Back to Work is in 3 hours 30 minutes (6/2/2011)
-      def command_next(m, show_keyword)
-        show = Shows.find_show(show_keyword) if show_keyword and !show_keyword.strip.empty?
-        event = next_event(show)
+      # !next -> Next show is Linux Action Show in 3 hours 30 minutes (6/2/2011)
+      def command_next(m)
+        event = next_event
 
         if event
           response = ""
 
-          if show
-            response << "The next #{show.title} is"
-          else
-            response << "Next show is #{event.summary}"
-          end
+          response << "Next show is #{event.summary}"
 
           date_string, time_string = to_local_date_and_time_strings(event.start_time)
           response << " in #{ChronicDuration.output(seconds_until(event.start_time), :format => :long)} (#{time_string} on #{date_string})"
 
           m.reply response
-        elsif show
-          m.reply "No upcoming show found for #{show.title} in the next week"
         else
           m.reply "No upcoming show found in the next week"
         end
+      end
 
+      # Replies to the user with information about the next specified show
+      # !next cr -> The next Coder Radio is in 3 hours 30 minutes (6/2/2011)
+      def command_next_show(m, show_keyword)
+        if show_keyword.strip.empty?
+          command_next(m)
+          return
+        end
+
+        show = Shows.find_show(show_keyword)
+
+        if !show
+          if show_keyword.strip == "Robert'); DROP TABLE students;--"
+            m.reply "Oh, yes. Little Bobby Tables, we call him."
+          else
+            m.reply "Cannot find a show for #{show_keyword}"
+          end
+
+          return
+        end
+
+        event = next_event(show)
+
+        if !event
+          m.reply "No upcoming show found for #{show.title} in the next week"
+          return
+        end
+
+        response = ""
+
+        response << "The next #{event.summary} is"
+
+        date_string, time_string = to_local_date_and_time_strings(event.start_time)
+        response << " in #{ChronicDuration.output(seconds_until(event.start_time), :format => :long)} (#{time_string} on #{date_string})"
+
+        m.reply response
       end
 
       # Replies with the schedule for the next 7 days of shows
