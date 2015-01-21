@@ -3,12 +3,16 @@
 ## Workflow
 
 1. [Fork the repo](https://github.com/rikai/Showbot/fork),
-2. Make the change,
+2. Branch from the branch `branch-from-here`,
+    * `git checkout -b BRANCHTYPE/issue-or-descriptive-name branch-from-here`
+    * `BRANCHTYPE` should be `FEATURE` for features, `BUG` for bugs,
+    * `issue-or-descriptive-name` should be the issue number _or_ a descriptive name of what is being implemented
+3. Make the change,
     * Follow code conventions,
     * Test your code to make sure it works right,
-3. Make a pull request (bonus points for topic branches),
-4. Make any requested adjustments,
-5. If/When accepted, party :tada:
+4. Make a pull request (bonus points for topic branches),
+5. Make any requested adjustments,
+6. If/When accepted, party :tada:
 
 ## What you will need
 
