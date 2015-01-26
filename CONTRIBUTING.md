@@ -3,8 +3,8 @@
 ## Workflow
 
 1. [Fork the repo](https://github.com/rikai/Showbot/fork),
-2. Branch from the branch `branch-from-here`,
-    * `git checkout -b BRANCHTYPE/issue-or-descriptive-name branch-from-here`
+2. Branch from `devel`,
+    * `git checkout -b BRANCHTYPE/issue-or-descriptive-name devel`
     * `BRANCHTYPE` should be `FEATURE` for features, `BUG` for bugs,
     * `issue-or-descriptive-name` should be the issue number _or_ a descriptive name of what is being implemented
 3. Make the change,
@@ -16,17 +16,14 @@
 
 ## What you will need
 
-You will need the following tools to contribute to JBot (package names are for Ubuntu):
+You will need the following tools to contribute to JBot:
 
 * [RVM](https://rvm.io/)
+* Ruby
 * Bundler
 * Git
-* Other packages:
-    * libmysqlclient-dev
-    * sqlite3
-    * libsqlite3-dev
-    * libxml2-dev
-    * libxslt1-dev
+* SQLite3
+* MySQL
 
 If you are not familiar with Git, check out the [free ebook](http://git-scm.com/book/).
 
@@ -41,6 +38,7 @@ These commands will get you setup to run Showbot.
 
  * `git clone https://github.com/rikai/Showbot.git`
  * `cd Showbot`
+ * `git checkout devel`
  * `bundle`
  * `foreman run rake db:migrate`
 
