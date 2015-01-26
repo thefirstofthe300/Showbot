@@ -18,8 +18,7 @@
 
 You will need the following tools to contribute to JBot (package names are for Ubuntu):
 
-* Ruby 2.0+
-* Rake
+* [RVM](https://rvm.io/)
 * Bundler
 * Git
 * Other packages:
