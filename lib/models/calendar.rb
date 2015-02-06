@@ -40,7 +40,7 @@ module Calendar
         :authenticated => false,
         :parameters => {
           'calendarId' => @config[:calendar_id],
-          'fields' => 'items(start,summary)',
+          'fields' => 'items(start,end,summary)',
           'singleEvents' => true,
           'orderBy' => 'startTime',
           'timeMin' => DateTime.now.to_s,
@@ -51,7 +51,7 @@ module Calendar
 
       results.data.items.map do |event|
         summary = event.summary.gsub(/^LIVE:\s+/, '')
-        CalendarEvent.new(summary, event.start.date_time)
+        CalendarEvent.new(summary, event.start.date_time, event.end.date_time)
       end
     end
   end
@@ -59,10 +59,12 @@ module Calendar
   class CalendarEvent
     attr_reader :summary
     attr_reader :start_time
+    attr_reader :end_time
 
-    def initialize(summary, start_time)
+    def initialize(summary, start_time, end_time)
       @summary = summary
       @start_time = start_time
+      @end_time = end_time
     end
   end
 end

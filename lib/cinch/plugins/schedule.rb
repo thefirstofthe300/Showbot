@@ -29,20 +29,27 @@ module Cinch
       # Replies to the user with information about the next show
       # !next -> Next show is Linux Action Show in 3 hours 30 minutes (6/2/2011)
       def command_next(m)
+        response = ""
+
+        event = live_event
+
+        if event
+          response << "#{event.summary} is live right now! "
+        end
+
         event = next_event
 
         if event
-          response = ""
-
           response << "Next show is #{event.summary}"
 
           date_string, time_string = to_local_date_and_time_strings(event.start_time)
           response << " in #{ChronicDuration.output(seconds_until(event.start_time), :format => :long)} (#{time_string} on #{date_string})"
 
-          m.reply response
         else
-          m.reply "No upcoming show found in the next week"
+          response << "No upcoming show found in the next week"
         end
+
+        m.reply response
       end
 
       # Replies to the user with information about the next specified show
@@ -99,6 +106,17 @@ module Cinch
       end
 
       protected
+
+      # Get a live event if there is one, or nil
+      def live_event
+        event = @events.select do |evt|
+          evt.end_time > Time.now
+        end.first
+
+        if event.start_time < Time.now
+          event
+        end
+      end
 
       # Gets the next event from the list of events
       # If a show is provided, search the events for a summary that starts with
