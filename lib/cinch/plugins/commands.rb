@@ -50,7 +50,7 @@ module Cinch
         date_string = @start_time.strftime("%-m/%-d/%Y")
         time_string = @start_time.strftime("%-I:%M%P")
         seconds_running = (Time.now - @start_time).to_i
-        m.user.send "#{shared[:Bot_Nick]} has been running for " +
+        m.user.notice "#{shared[:Bot_Nick]} has been running for " +
           "#{ChronicDuration.output(seconds_running, :format => :long)} " +
           "since #{date_string} at #{time_string}"
       end

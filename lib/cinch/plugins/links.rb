@@ -41,10 +41,10 @@ module Cinch
           )
 
           if new_link.saved?
-            m.user.send "Added link suggestion #{new_link.uri}"
+            m.user.notify "Added link suggestion #{new_link.uri}"
           else
             new_link.errors.each do |e|
-              m.user.send e.first
+              m.user.notify e.first
             end
           end
         end
