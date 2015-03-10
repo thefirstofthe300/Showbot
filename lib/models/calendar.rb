@@ -1,7 +1,47 @@
 require 'google/api_client'
 
+# The Calendar module provides access to remote calendars to JBot plugins. It
+# currently pulls events from a Google Calendar as the default backend. The
+# events are filtered so that only live events (where the title starts with
+# 'LIVE: ') are fetched. To get a Calendar object, use
+# `Calendar.new(config_data)` to get a duck-typed Calendar object that meets the
+# following interface:
+#
+#   Calendar#events: returns an array of Calendar::CalendarEvents
+#
+# A Calendar::CalendarEvent object holds basic event data, and provides the
+# following (read-only) attributes:
+#
+#   summary:    (string) The title of the event, with 'LIVE: ' prefix removed.
+#   start_time: (DateTime) The start time of the event.
+#   end_time:   (DateTime) The end time of the event.
 module Calendar
-  # Create a new Calendar object, here a GoogleCalendar object
+  # Create a new Calendar object, here a GoogleCalendar object. This method is a
+  # factory method to get a Calendar duck-subtype object.
+  # A Calendar object fetches a remote calendar feed. Those events can then be
+  # retrieved as an array of Calendar::CalendarEvent objects.
+  #
+  # param config: The `config` parameter is a hash of configuration data.
+  # Currently, it pulls in the parameters required to call out to the Google
+  # Calendar API. A simple way to have all this set is to pass the Cinch plugin
+  # config object into this method, and set all the required fields in the
+  # cinchize.yml config file. The hash has the following required keys:
+  #
+  #   app_name:    The name of your application
+  #   app_version: The version of your application
+  #   calendar_id: The Google Calendar ID of the calendar you want to use
+  #   api_key:     Your API key for the Google Calendar API
+  #
+  # The `app_name` and `app_version` fields can be arbitrary, and are for
+  # Google's use. The calendar_id is of the form:
+  #
+  #   CALENDARIDHERE@group.calendar.google.com
+  #
+  # and is embedded in your calendar's URLs. The api_key must be obtained from
+  # Google through their API Console at https://code.google.com/apis/console
+  #
+  # TODO: Right now, this errors out on missing/invalid config. It should
+  #   instead return a NullCalendar object that returns no events.
   def self.new(config = {})
     google_config = {
       :app_name => config[:app_name],
@@ -22,7 +62,18 @@ module Calendar
     GoogleCalendar.new(google_config, google_client, google_api)
   end
 
+  # The Calendar::GoogleCalendar class provides the default backend for Calendar
   class GoogleCalendar
+    # param config: (hash) A config hash with the keys:
+    #
+    #   app_name:    The name of your application
+    #   app_version: The version of your application
+    #   calendar_id: The Google Calendar ID of the calendar you want to use
+    #   api_key:     Your API key for the Google Calendar API
+    #
+    # param client: (Google::APIClient) A Google API client object
+    # param api: (Google::APIClient::API) A Google API object, obtained from
+    #   calling the `Google::APIClient#discovered_api` method.
     def initialize(config, client, api)
       @config = config
       @client = client
@@ -56,6 +107,13 @@ module Calendar
     end
   end
 
+  # The CalendarEvent class holds data for individual events. It is provided to
+  # encapsulate any variations in calendar data back-ends. It has the following
+  # (read-only) attributes:
+  #
+  #   summary:    (string) The title of the event, with 'LIVE: ' prefix removed.
+  #   start_time: (DateTime) The start time of the event.
+  #   end_time:   (DateTime) The end time of the event.
   class CalendarEvent
     attr_reader :summary
     attr_reader :start_time
