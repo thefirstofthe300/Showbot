@@ -9,6 +9,8 @@ module Cinch
 
       timer 600, :method => :refresh_calendar
 
+      listen_to :connect, :method => :on_connect
+
       match /next\s*$/i,        :method => :command_next      # !next
       match /next\s+(.*)/i,     :method => :command_next_show # !next <show>
       match /schedule\s?(.*)/i, :method => :command_schedule  # !schedule
@@ -17,6 +19,11 @@ module Cinch
         super
         @calendar = Calendar.new(config)
         @events = []
+      end
+
+      # A method called on connection to an IRC server
+      # Use to call any additional initialization
+      def on_connect(m)
         refresh_calendar
       end
 
