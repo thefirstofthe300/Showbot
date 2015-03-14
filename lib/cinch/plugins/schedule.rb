@@ -1,4 +1,3 @@
-require 'chronic_duration'
 require './lib/models/shows'
 require './lib/models/calendar'
 
@@ -48,10 +47,7 @@ module Cinch
 
         if event
           response << "Next show is #{event.summary}"
-
-          date_string, time_string = to_local_date_and_time_strings(event.start_time)
-          response << " in #{ChronicDuration.output(seconds_until(event.start_time), :format => :long)} (#{time_string} on #{date_string})"
-
+          response << " in #{event.fancy_time_until} (#{event.start_time_to_local_string} on #{event.start_date_to_local_string})"
         else
           response << "No upcoming show found in the next week"
         end
@@ -89,9 +85,7 @@ module Cinch
         response = ""
 
         response << "The next #{event.summary} is"
-
-        date_string, time_string = to_local_date_and_time_strings(event.start_time)
-        response << " in #{ChronicDuration.output(seconds_until(event.start_time), :format => :long)} (#{time_string} on #{date_string})"
+        response << " in #{event.fancy_time_until} (#{event.start_time_to_local_string} on #{event.start_date_to_local_string})"
 
         m.reply response
       end
@@ -107,8 +101,7 @@ module Cinch
 
         # Push only the next 10 shows to avoid flooding
         @events[0...10].each do |event|
-          date_string, time_string = to_local_date_and_time_strings(event.start_time)
-          m.user.send "  #{event.summary} on #{date_string} at #{time_string}"
+          m.user.send "  #{event.summary} on #{event.start_date_to_local_string} at #{event.start_time_to_local_string}"
         end
       end
 
@@ -116,13 +109,9 @@ module Cinch
 
       # Get a live event if there is one, or nil
       def live_event
-        event = @events.select do |evt|
-          evt.end_time > Time.now
+        @events.select do |event|
+          event.covers? Time.now
         end.first
-
-        if event.start_time < Time.now
-          event
-        end
       end
 
       # Gets the next event from the list of events
@@ -136,22 +125,8 @@ module Cinch
             event.summary.start_with? show.title
           end
         end.select do |event|
-          event.start_time > Time.now
+          event.after? Time.now
         end.first
-      end
-
-      # Convert a DateTime to local date and time strings
-      # Returns [datestring, timestring]
-      def to_local_date_and_time_strings(time)
-        [
-          time.strftime("%A, %-m/%-d/%Y"),
-          time.strftime("%-I:%M%P EST")
-        ]
-      end
-
-      # Get the number of seconds until event_time
-      def seconds_until(event_time)
-        (event_time - Time.now).to_i
       end
     end
   end

@@ -1,4 +1,5 @@
 require 'google/api_client'
+require 'chronic_duration'
 
 # The Calendar module provides access to remote calendars to JBot plugins. It
 # currently pulls events from a Google Calendar as the default backend. The
@@ -123,6 +124,37 @@ module Calendar
       @summary = summary
       @start_time = start_time
       @end_time = end_time
+    end
+
+    # Determine of an event covers a time (is between event start and end)
+    def covers?(time)
+      start_time <= time && time < end_time
+    end
+
+    # Determine if an event starts after a time
+    def after?(time)
+      start_time > time
+    end
+
+    # Output a fancy breakdown of time until event
+    def fancy_time_until
+      ChronicDuration.output(seconds_until, :format => :long)
+    end
+
+    # Get the number of seconds until event starts
+    # returns: (int) Seconds until start
+    def seconds_until
+      (start_time - Time.now).to_i
+    end
+
+    # Convert start date to local string
+    def start_date_to_local_string
+      start_time.strftime("%A, %-m/%-d/%Y")
+    end
+
+    # Convert start time to local string
+    def start_time_to_local_string
+      start_time.strftime("%-I:%M%P %Z")
     end
   end
 end
