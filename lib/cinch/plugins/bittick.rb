@@ -58,7 +58,7 @@ module Cinch
       end
 
       def command_bittick(m)
-        m.user.notice help_bittick
+        m.user.send help_bittick
       end
 
       def command_goxtick(m)

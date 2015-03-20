@@ -30,10 +30,10 @@ module Cinch
           )
 
           if new_suggestion.saved?
-            m.user.notice "Added title suggestion \"#{new_suggestion.title}\""
+            m.user.send "Added title suggestion \"#{new_suggestion.title}\""
           else
             new_suggestion.errors.each do |e|
-              m.user.notice e.first
+              m.user.send e.first
             end
           end
         end
