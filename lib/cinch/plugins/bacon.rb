@@ -4,6 +4,7 @@ module Cinch
       include Cinch::Plugin
 
       match /bacon$/i,        :method => :command_bacon       # !bacon
+      match /bacon\s+(.+)/i,  :method => :command_bacon_gift  # !bacon <user>
 
       def help
         '!bacon - Delicious bacon.'
@@ -12,16 +13,30 @@ module Cinch
       def help_bacon
         [
           help,
-          'Usage: !bacon'
+          'Usage: !bacon [user]'
         ].join "\n"
       end
 
       def command_bacon(m)
-#        if ["bunny", "madjo", "nogal", "nogal|work"].include?(m.user.nick) # In case i ever want to go back to 'restricting' the command
-          m.channel.action "gives #{m.user.nick} a strip of delicious bacon."
-#        else
-#          m.reply "This bacon is reserved for true bacon connoisseurs, #{m.user.nick}!" # This stuff too.
-#        end
+        return if !m.channel?
+
+        m.action_reply "gives #{m.user} a strip of delicious bacon."
+      end
+
+      def command_bacon_gift(m, user)
+        channel_user = find_channel_user(m, user)
+        return if !channel_user
+
+        m.safe_action_reply "gives #{channel_user} a strip of delicious bacon as a gift from #{m.user}."
+      end
+
+      private
+
+      def find_channel_user(m, user)
+        return nil if !m.channel?
+        m.channel.users.keys.select do |channel_user|
+          channel_user.to_s.casecmp(user).zero?
+        end.first
       end
     end
   end
