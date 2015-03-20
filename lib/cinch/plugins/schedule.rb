@@ -10,9 +10,30 @@ module Cinch
 
       listen_to :connect, :method => :on_connect
 
-      match /next\s*$/i,        :method => :command_next      # !next
-      match /next\s+(.*)/i,     :method => :command_next_show # !next <show>
-      match /schedule\s?(.*)/i, :method => :command_schedule  # !schedule
+      match /next$/i,           :method => :command_next      # !next
+      match /next\s+(.+)/i,     :method => :command_next_show # !next <show>
+      match /schedule/i,        :method => :command_schedule  # !schedule
+
+      def help
+        [
+          '!next - When\'s the next live show?',
+          '!schedule - What shows are being recorded live in the next seven days?'
+        ].join "\n"
+      end
+
+      def help_next
+        [
+          '!next - When\'s the next live show?'
+          'Usage: !next [show]'
+        ].join "\n"
+      end
+
+      def help_schedule
+        [
+          '!schedule - What shows are being recorded live in the next seven days?'
+          'Usage: !schedule'
+        ].join "\n"
+      end
 
       def initialize(*args)
         super
@@ -91,7 +112,7 @@ module Cinch
       end
 
       # Replies with the schedule for the next 7 days of shows
-      def command_schedule(m, command)
+      def command_schedule(m)
         if @events.empty?
           m.user.send "No shows in the next week"
           return

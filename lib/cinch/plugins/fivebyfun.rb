@@ -6,24 +6,13 @@ module Cinch
       include Cinch::Plugin
 
       # Hosts
-      match /(chris|chrislas)/i,           :method => :command_chris
-      match /(angpaddle|angela|fauxang)/i, :method => :command_angela
-      match /(allan)/i,                    :method => :command_allan
-    # match /(mars_base)/i,                :method => :command_marsbase
+      match /(chris|chrislas)/i,            :method => :command_chris
+      match /(angpaddle|angela|fauxang)/i,  :method => :command_angela
+      match /(allan)/i,                     :method => :command_allan
 
       # Etc.
-      match /(eight_ball|8ball)/i,         :method => :command_eight_ball
-      match /(mumble)/i,                   :method => :command_mumble
-      match /(irc)/i,                   :method => :command_irc
-      match /(RMS)/i,                   :method => :command_rms
-
-      def command_mumble(m)
-        m.reply "Mumble info - Server: mumble.jupitercolony.com, Port: 64734"
-      end
-
-      def command_irc(m)
-        m.reply "IRC info - Server: irc.geekshed.net, Channel: #jupiterbroadcasting"
-      end
+      match /(eight_ball|8ball)/i,          :method => :command_eight_ball
+      match /(RMS)/i,                       :method => :command_rms
 
       def command_rms(m)
         m.reply ["It's negative in the freedom... dimension. - Via http://youtu.be/radmjL5OIaA",

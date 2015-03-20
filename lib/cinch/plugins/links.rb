@@ -11,21 +11,24 @@ module Cinch
     class Links
       include Cinch::Plugin
 
-      match /(?:link|l) (.+)/i,  :method => :command_link  # !link http://audacious_thunderbolt.org/islate
-      match "links",             :method => :command_links # !links Show where the user can go to see links
-      match "help link",         :method => :command_help  # !help link
+      match /link\s+(.*)/i,     :method => :command_link      # !link http://example.com/greatest-link-ever
 
+      def help
+        '!link - Know the link for that? Suggest it and make the show better.'
+      end
 
-      # Show help for the suggestions module
-      def command_help(m)
-        m.user.send "Suggest a relevant link for the current show."
-        m.user.send "  Usage: !link http://audacious_thunderbolt.org/islate"
+      def help_link
+        [
+          help,
+          'Usage: !link http://example.com/greatest-link-ever',
+          "Go to #{shared[:Sinatra_Url]}links to see the link suggestions."
+        ].join "\n"
       end
 
       # Add the user's link to the database
       def command_link(m, uri_string)
         if uri_string.empty?
-          command_help(m)
+          m.user.send help_link
         else
           # Verify this is a valid URI
           uri = Addressable::URI::parse(uri_string)
@@ -48,14 +51,7 @@ module Cinch
             end
           end
         end
-
       end
-
-      # Tell them where to find the lovely links
-      def command_links(m)
-        m.user.send "Go to #{shared[:Sinatra_Url]}" + "/links to see the link suggestions."
-      end
-
     end
   end
 end

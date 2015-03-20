@@ -16,8 +16,49 @@ module Cinch
       match /(bitavg)/i,                    :method => :command_bitavg
       match /(dogetick)/i,                    :method => :command_dogetick
 
+      def help
+        [
+          '!goxtick - Bitcoin Ticker (MtGox)',
+          '!bitavg - Bitcoin averages from bitcoinaveages.com',
+          '!btcetick - Bitcoin Ticker (BTC-E)',
+          '!dogetick - Dogecoin Ticker (BTer)'
+        ].join "\n"
+      end
+
+      def help_goxtick
+        [
+          '!goxtick - Bitcoin Ticker (MtGox)',
+          'Usage: !goxtick'
+        ].join "\n"
+      end
+
+      def help_btcetick
+        [
+          '!btcetick - Bitcoin Ticker (BTC-E)',
+          'Usage: !btcetick'
+        ].join "\n"
+      end
+
+      def help_bittick
+        '!bittick is deprecated, please use !bitavg for the average across all exchanges, !goxtick for MtGox and !btcetick for BTC-E, thanks!'
+      end
+
+      def help_bitavg
+        [
+          '!bitavg - Bitcoin averages from bitcoinaveages.com',
+          'Usage: !bitavg'
+        ].join "\n"
+      end
+
+      def help_dogetick
+        [
+          '!dogetick - Dogecoin Ticker (BTer)',
+          'Usage: !dogetick'
+        ].join "\n"
+      end
+
       def command_bittick(m)
-        m.user.notice "!bittick is deprecated, please use !bitavg for the average across all exchanges, !goxtick for MtGox and !btcetick for BTC-E, thanks!"
+        m.user.notice help_bittick
       end
 
       def command_goxtick(m)
@@ -38,6 +79,7 @@ module Cinch
             low: goxlow['display'],
             vol: goxvol['display']
           }
+      end
 
       def command_btcetick(m)
         btcejson = open('https://btc-e.com/api/2/btc_usd/ticker').read

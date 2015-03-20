@@ -11,7 +11,15 @@ module Cinch
 
       timer 60, :method => :send_last_status
 
-      match "last_status",   :method => :command_last_status
+      match "last_status", :method => :command_last_status
+
+      def help
+        "!last_status - The last tweet by @#{Array(@user).join(", @")} delievered to you in IRC. Sweet."
+      end
+
+      def help_last_status
+        "#{help}\nUsage: !last_status"
+      end
 
       Client = ::Twitter::REST::Client.new do |c|
         c.consumer_key = config[:twitter_consumer_key]

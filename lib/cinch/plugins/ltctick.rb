@@ -8,6 +8,14 @@ module Cinch
 
       match /(litetick)/i,                    :method => :command_litetick
 
+      def help
+        '!litetick - Litecoin Ticker (BTC-E)'
+      end
+
+      def help_litetick
+        "#{help}\nUsage: !litetick"
+      end
+
       def command_litetick(m)
         json = open('https://btc-e.com/api/2/ltc_usd/ticker').read
         data = JSON::parse(json)["ticker"]
