@@ -7,9 +7,19 @@ plugins: &plugins
     options:
       :bot_admin_password: "test"
   -
-    class: "Cinch::Plugins::Commands"
+    class: "Cinch::Plugins::Help"
+  -
+    class: "Cinch::Plugins::About"
+  -
+    class: "Cinch::Plugins::Uptime"
+  -
+    class: "Cinch::Plugins::Bacon"
   -
     class: "Cinch::Plugins::FiveByFun"
+  -
+    class: "Cinch::Plugins::Ltctick"
+  -
+    class: "Cinch::Plugins::Bittick"
   -
     class: "Cinch::Plugins::Identify"
     options:
