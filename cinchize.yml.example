@@ -15,7 +15,9 @@ plugins: &plugins
   -
     class: "Cinch::Plugins::Bacon"
   -
-    class: "Cinch::Plugins::FiveByFun"
+    class: "Cinch::Plugins::Quotes"
+    options:
+      :quotes_file: 'your-quotes-file.yml'
   -
     class: "Cinch::Plugins::Ltctick"
   -
