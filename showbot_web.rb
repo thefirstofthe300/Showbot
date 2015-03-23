@@ -55,7 +55,19 @@ class ShowbotWeb < Sinatra::Base
       haml :'suggestion/hacker_mode', :locals => {suggestion_sets: suggestion_sets, :view_mode => view_mode}, :layout => false
     when 'json'
       content_type :json
-      suggestion_sets.to_json
+      suggestion_sets.map do |suggestion_set|
+        {
+          :show => suggestion_set.slug,
+          :titles => suggestion_set.suggestions.map do |s|
+            {
+              :title => s.title,
+              :user => s.user,
+              :created_at => s.created_at,
+              :votes => s.votes_counter
+            }
+          end
+        }
+      end.to_json
     else
       haml :'suggestion/index', :locals => {suggestion_sets: suggestion_sets, :view_mode => view_mode}
     end
