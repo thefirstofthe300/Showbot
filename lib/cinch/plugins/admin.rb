@@ -5,8 +5,6 @@ module Cinch
     class Admin
       include Cinch::Plugin
 
-      timer 300, :method => :fix_name
-
       match /(?:exit|quit)/i,     :method => :command_exit
       match /start_show\s+(.+)/i, :method => :command_start_show
       match /end_show/i,          :method => :command_end_show
@@ -68,16 +66,6 @@ module Cinch
           channel.send "#{shared[:Bot_Nick]} is shutting down. Good bye :("
         end
         Process.exit
-      end
-
-      # Called every 5 minutes to attempt to fix the bots name.
-      # This can happen if the bot gets disconnected and reconnects before
-      # the last bot as been kicked from the IRC server.
-      def fix_name
-        if bot.nick != shared[:Bot_Nick]
-          puts "Fixing nickname."
-          bot.nick = shared[:Bot_Nick]
-        end
       end
 
       private

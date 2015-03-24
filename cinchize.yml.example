@@ -14,6 +14,8 @@ plugins: &plugins
   -
     class: "Cinch::Plugins::Uptime"
   -
+    class: "Cinch::Plugins::StickyNick"
+  -
     class: "Cinch::Plugins::Bacon"
   -
     class: "Cinch::Plugins::Quotes"
