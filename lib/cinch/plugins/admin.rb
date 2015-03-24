@@ -7,43 +7,44 @@ module Cinch
 
       timer 300, :method => :fix_name
 
-      match %r{(?:exit|quit) (.+)},   :method => :command_exit
+      match /(?:exit|quit)/i,     :method => :command_exit
 
       def initialize(*args)
         super
-        @admin_password = config[:bot_admin_password]
-
-        if @admin_password.nil? or @admin_password.strip.empty?
-          # Generate an admim key since one wasn't found
-          @admin_password ||= (0...8).map{65.+(rand(25)).chr}.join
-          puts "Admin key is #{@admin_password}"
-        end
+        @admins = Array(config[:admins])
       end
 
       # Admin command that tells the bot to exit
-      # !exit @admin_password
-      def command_exit(m, password)
-        if password == @admin_password
-          m.user.send "#{shared[:Bot_Nick]} is shutting down. Good bye :("
-
-          Process.exit
-        else
-          puts "Wrong admin password (#{password}), should be #{@admin_password}"
+      # !exit
+      def command_exit(m)
+        if !authed? m.user
+          m.user.send "You are not authorized to exit #{shared[:Bot_Nick]}."
+          return
         end
+
+        m.user.send "#{shared[:Bot_Nick]} is shutting down. Good bye :("
+        Process.exit
       end
 
       # Called every 5 minutes to attempt to fix the bots name.
       # This can happen if the bot gets disconnected and reconnects before
       # the last bot as been kicked from the IRC server.
       def fix_name
-        if @bot.nick == "#{shared[:Bot_Nick]}"
-          puts "Nick is fine, no change necessary."
-        else
+        if bot.nick != shared[:Bot_Nick]
           puts "Fixing nickname."
-          @bot.nick = "#{shared[:Bot_Nick]}"
+          bot.nick = shared[:Bot_Nick]
         end
       end
 
+      private
+
+      # Is a user an authorized user?
+      # The user must be in the list of admins from the config file, and must
+      # also be authenticated to NickServ.
+      # param user: (Cinch::User) The user
+      def authed?(user)
+        @admins.include?(user.nick) && user.authed?
+      end
     end
   end
 end

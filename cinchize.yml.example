@@ -5,7 +5,8 @@ plugins: &plugins
   -
     class: "Cinch::Plugins::Admin"
     options:
-      :bot_admin_password: "test"
+      :admins:
+        - "YourNickHere"
   -
     class: "Cinch::Plugins::Help"
   -
