@@ -14,7 +14,7 @@ module Cinch
       def initialize(*args)
         super
         @admins = Array(config[:admins])
-        @data_json = File.join File.dirname(__FILE__), "../../../#{config[:data_json]}"
+        @data_json = DataJSON.new config[:data_json]
       end
 
       def command_start_show(m, show_slug)
@@ -29,16 +29,7 @@ module Cinch
           return
         end
 
-        open(@data_json, 'w') do |file|
-          file.write({
-            :live => true,
-            :broadcast => {
-              :slug => show.url,
-              :title => show.title,
-              :started_at => DateTime.now
-            }
-          }.to_json)
-        end
+        @data_json.start_show show
 
         bot.channels.each do |channel|
           channel.send "#{show.title} starts now!"
@@ -51,14 +42,17 @@ module Cinch
           return
         end
 
-        open(@data_json, 'w') do |file|
-          file.write({
-            :live => false
-          }.to_json)
+        if !@data_json.live?
+          m.user.send 'No live show, but thanks for playing!'
+          return
         end
 
+        title = @data_json.title
+
+        @data_json.end_show
+
         bot.channels.each do |channel|
-          channel.send "Show's over, folks. Thanks for coming!"
+          channel.send "Show's over, folks. Thanks for coming to #{title}!"
         end
       end
 
@@ -70,7 +64,9 @@ module Cinch
           return
         end
 
-        m.user.send "#{shared[:Bot_Nick]} is shutting down. Good bye :("
+        bot.channels.each do |channel|
+          channel.send "#{shared[:Bot_Nick]} is shutting down. Good bye :("
+        end
         Process.exit
       end
 
