@@ -8,10 +8,58 @@ module Cinch
       timer 300, :method => :fix_name
 
       match /(?:exit|quit)/i,     :method => :command_exit
+      match /start_show\s+(.+)/i, :method => :command_start_show
+      match /end_show/i,          :method => :command_end_show
 
       def initialize(*args)
         super
         @admins = Array(config[:admins])
+        @data_json = File.join File.dirname(__FILE__), "../../../#{config[:data_json]}"
+      end
+
+      def command_start_show(m, show_slug)
+        if !authed? m.user
+          m.user.send 'You are not authorized to start a show.'
+          return
+        end
+
+        show = Shows.find_show show_slug
+        if show.nil?
+          m.user.send 'Sorry, but I couldn\'t find that particular show.'
+          return
+        end
+
+        open(@data_json, 'w') do |file|
+          file.write({
+            :live => true,
+            :broadcast => {
+              :slug => show.url,
+              :title => show.title,
+              :started_at => DateTime.now
+            }
+          }.to_json)
+        end
+
+        bot.channels.each do |channel|
+          channel.send "#{show.title} starts now!"
+        end
+      end
+
+      def command_end_show(m)
+        if !authed? m.user
+          m.user.send 'You are not authorized to end a show.'
+          return
+        end
+
+        open(@data_json, 'w') do |file|
+          file.write({
+            :live => false
+          }.to_json)
+        end
+
+        bot.channels.each do |channel|
+          channel.send "Show's over, folks. Thanks for coming!"
+        end
       end
 
       # Admin command that tells the bot to exit
