@@ -17,6 +17,7 @@ Moderate
 - [x] Add the ability to hot-reload plugins without restarting JBot
 - [ ] Add the sed module to the repo and correct its broken functionality
  - [ ]  Users can currently use sed on other users text and there is also no limit to the sed length, which causes spam issues
+- [ ] Make plugins that use `data.json` more robust
 
 Time Consuming
 ------------------
