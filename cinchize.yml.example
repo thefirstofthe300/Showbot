@@ -33,6 +33,8 @@ plugins: &plugins
   -
     class: "Cinch::Plugins::Links"
   -
+    class: "Cinch::Plugins::LinkTitle"
+  -
     class: "Cinch::Plugins::Schedule"
     options: # Customize these options to match your configuration
       :app_name: 'JBot'
