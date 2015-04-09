@@ -5,6 +5,7 @@ plugins: &plugins
   -
     class: "Cinch::Plugins::Admin"
     options:
+      :data_json: "local/path/to/data.json"
       :admins:
         - "YourNickHere"
   -
