@@ -27,10 +27,15 @@ module Cinch
           return
         end
 
-        @data_json.start_show show
+        begin
+          @data_json.start_show show
 
-        bot.channels.each do |channel|
-          channel.send "#{show.title} starts now!"
+          bot.channels.each do |channel|
+            channel.send "#{show.title} starts now!"
+          end
+        rescue IOError => err
+          exception err
+          m.user.send 'IO Error: Cannot persist data!'
         end
       end
 
@@ -47,10 +52,15 @@ module Cinch
 
         title = @data_json.title
 
-        @data_json.end_show
+        begin
+          @data_json.end_show
 
-        bot.channels.each do |channel|
-          channel.send "Show's over, folks. Thanks for coming to #{title}!"
+          bot.channels.each do |channel|
+            channel.send "Show's over, folks. Thanks for coming to #{title}!"
+          end
+        rescue IOError => err
+          exception err
+          m.user.send 'IO Error: Cannot persist data!'
         end
       end
 
