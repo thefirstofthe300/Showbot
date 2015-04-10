@@ -8,6 +8,7 @@ module Cinch
 
       timer 60, :method =>  :poll_for_statuses
 
+      match /last_status$/i,        :method => :command_last_status_list
       match /last_status\s+(.*)/i,  :method => :command_last_status
 
       def help
@@ -36,9 +37,18 @@ module Cinch
         end
       end
 
+      def command_last_status_list(m)
+        m.user.send "Here are the Twitter users I know: @#{@client.user_names.join(", @")}"
+      end
+
       def command_last_status(m, user)
         user = trim_at_sign user
-        m.reply @client.last_status_for user
+        last_status = @client.last_status_for user
+        if last_status.nil?
+          m.user.send "Sorry, #{user} is not a user I know."
+        else
+          m.reply last_status
+        end
       end
 
       private
