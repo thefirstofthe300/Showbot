@@ -39,9 +39,11 @@ module DataJSON
     end
 
     def read
-      json = JSON.load @data_json.read
-
-      raise IOError, "DataJSON could not be parsed." if json.nil?
+      begin
+        json = JSON.load @data_json.read
+      rescue JSON::ParserError => err
+        raise IOError, "DataJSON could not be parsed: #{err}", err.backtrace
+      end
 
       self.live = json[:live]
       if !json[:broadcast].nil?
