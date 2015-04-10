@@ -41,11 +41,15 @@ module TwitterClient
     end
 
     def valid_twitter_user?(user)
-      @statuses.has_key? user
+      user = user.downcase
+      user_names.any? do |canonical_name|
+        canonical_name.downcase == user
+      end
     end
 
     def last_status_for(user)
       return nil unless valid_twitter_user? user
+      user = canonicalize_handle user
       @statuses[user]
     end
 
@@ -75,6 +79,15 @@ module TwitterClient
       end
 
       updated_users
+    end
+
+    private
+
+    def canonicalize_handle(handle)
+      handle.downcase!
+      user_names.select do |canonical_handle|
+        canonical_handle.downcase == handle
+      end.first
     end
   end
 
