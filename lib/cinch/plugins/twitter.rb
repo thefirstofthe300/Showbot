@@ -47,7 +47,7 @@ module Cinch
         if last_status.nil?
           m.user.send "Sorry, #{user} is not a user I know."
         else
-          m.reply last_status
+          m.user.send last_status
         end
       end
 
