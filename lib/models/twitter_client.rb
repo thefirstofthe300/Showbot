@@ -84,7 +84,7 @@ module TwitterClient
     private
 
     def canonicalize_handle(handle)
-      handle.downcase!
+      handle = handle.downcase
       user_names.select do |canonical_handle|
         canonical_handle.downcase == handle
       end.first
