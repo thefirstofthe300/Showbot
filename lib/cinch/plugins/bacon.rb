@@ -27,7 +27,7 @@ module Cinch
         channel_user = find_channel_user(m, user)
         return if !channel_user
 
-        m.safe_action_reply "gives #{channel_user} a strip of delicious bacon as a gift from #{m.user}."
+        m.action_reply "gives #{channel_user} a strip of delicious bacon as a gift from #{m.user}."
       end
 
       private
