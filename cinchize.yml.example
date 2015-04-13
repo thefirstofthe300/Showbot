@@ -3,38 +3,34 @@
 plugins: &plugins
   plugins:
   -
+    class: "Cinch::Plugins::About"
+  -
     class: "Cinch::Plugins::Admin"
     options:
       :data_json: "local/path/to/data.json"
       :admins:
         - "YourNickHere"
   -
-    class: "Cinch::Plugins::Help"
-  -
-    class: "Cinch::Plugins::About"
-  -
-    class: "Cinch::Plugins::Uptime"
-  -
-    class: "Cinch::Plugins::StickyNick"
-  -
     class: "Cinch::Plugins::Bacon"
   -
-    class: "Cinch::Plugins::Quotes"
-    options:
-      :quotes_file: 'your-quotes-file.yml'
-  -
-    class: "Cinch::Plugins::Ltctick"
-  -
     class: "Cinch::Plugins::Bittick"
+  -
+    class: "Cinch::Plugins::Help"
   -
     class: "Cinch::Plugins::Identify"
     options:
       :password: "test" # Enter your password here
       :type: :nickserv # Most servers use nickserv, so setting this as the sane default.
   -
+    class: "Cinch::Plugins::Ltctick"
+  -
     class: "Cinch::Plugins::Links"
   -
     class: "Cinch::Plugins::LinkTitle"
+  -
+    class: "Cinch::Plugins::Quotes"
+    options:
+      :quotes_file: 'your-quotes-file.yml'
   -
     class: "Cinch::Plugins::Schedule"
     options: # Customize these options to match your configuration
@@ -43,11 +39,13 @@ plugins: &plugins
       :api_key: 'YOURAPIKEYHERE'
       :calendar_id: 'CALENDARIDHERE@group.calendar.google.com'
   -
-    class: "Cinch::Plugins::Suggestions"
-  -
     class: "Cinch::Plugins::Shoutcast"
     options:
       :shoutcast_uri: "http://www.example.com/"
+  -
+    class: "Cinch::Plugins::StickyNick"
+  -
+    class: "Cinch::Plugins::Suggestions"
   -
     class: "Cinch::Plugins::Twitter"
     options:
@@ -57,6 +55,8 @@ plugins: &plugins
       :consumer_secret: "YOURCONSUMERSECRETHERE"
       :access_token: "YOURACCESSTOKENHERE"
       :access_token_secret: "YOURACCESSTOKENSECRETHERE"
+  -
+    class: "Cinch::Plugins::Uptime"
 
 # The base configuration, Freenode in the example configuration.
 network_base: &network_base
