@@ -6,6 +6,7 @@ module Cinch
       include Cinch::Plugin
 
       match /(?:exit|quit)/i,     :method => :command_exit
+      match /start_show$/i,       :method => :command_show_list
       match /start_show\s+(.+)/i, :method => :command_start_show
       match /end_show/i,          :method => :command_end_show
       match /join\s(.+)/i,        :method => :command_join
@@ -35,6 +36,17 @@ module Cinch
         Channel(channel).part
       end
 
+      def command_show_list(m)
+        if !authed? m.user
+          m.user.send 'You are not authorized to start a show.'
+          return
+        end
+
+        shows = Shows.shows
+        shows.each do |show|
+          m.user.send "#{show.title}: !start_show #{show.url}"
+        end
+      end
 
       def command_start_show(m, show_slug)
         if !authed? m.user
