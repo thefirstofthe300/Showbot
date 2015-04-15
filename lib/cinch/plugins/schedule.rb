@@ -10,7 +10,7 @@ module Cinch
 
       listen_to :connect, :method => :on_connect
 
-      match /next$/i,           :method => :command_next      # !next
+      match /next\s*$/i,        :method => :command_next      # !next
       match /next\s+(.+)/i,     :method => :command_next_show # !next <show>
       match /schedule/i,        :method => :command_schedule  # !schedule
 
