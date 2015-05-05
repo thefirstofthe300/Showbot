@@ -4,7 +4,7 @@ module Cinch
       include Cinch::Plugin
 
       match /bacon$/i,        :method => :command_bacon       # !bacon
-      match /bacon\s+(.+)/i,  :method => :command_bacon_gift  # !bacon <user>
+      match /bacon\s+(\S+)/i, :method => :command_bacon_gift  # !bacon <user>
 
       def help
         '!bacon - Delicious bacon.'
@@ -23,20 +23,24 @@ module Cinch
         m.action_reply "gives #{m.user} a strip of delicious bacon."
       end
 
-      def command_bacon_gift(m, user)
-        channel_user = find_channel_user(m, user)
-        return if !channel_user
-
-        m.action_reply "gives #{channel_user} a strip of delicious bacon as a gift from #{m.user}."
+      def command_bacon_gift(m, user_name)
+        with_channel_user(m, user_name) do |to_user|
+          m.action_reply "gives #{to_user} a strip of delicious bacon as a gift from #{m.user}."
+        end
       end
 
       private
 
-      def find_channel_user(m, user)
-        return nil if !m.channel?
-        m.channel.users.keys.select do |channel_user|
+      def with_channel_user(m, user)
+        return unless m.channel?
+
+        target_user = m.channel.users.keys.select do |channel_user|
           channel_user.to_s.casecmp(user).zero?
         end.first
+
+        return if target_user.nil?
+
+        yield target_user
       end
     end
   end
