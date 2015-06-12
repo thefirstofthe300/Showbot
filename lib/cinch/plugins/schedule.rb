@@ -23,14 +23,14 @@ module Cinch
 
       def help_next
         [
-          '!next - When\'s the next live show?'
+          '!next - When\'s the next live show?',
           'Usage: !next [show]'
         ].join "\n"
       end
 
       def help_schedule
         [
-          '!schedule - What shows are being recorded live in the next seven days?'
+          '!schedule - What shows are being recorded live in the next seven days?',
           'Usage: !schedule'
         ].join "\n"
       end
