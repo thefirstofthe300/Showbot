@@ -1,3 +1,6 @@
+require 'optparse'
+require 'tzinfo'
+
 require './lib/models/shows'
 require './lib/models/calendar'
 
@@ -10,9 +13,9 @@ module Cinch
 
       listen_to :connect, :method => :on_connect
 
-      match /next\s*$/i,        :method => :command_next      # !next
-      match /next\s+(.+)/i,     :method => :command_next_show # !next <show>
-      match /schedule/i,        :method => :command_schedule  # !schedule
+      match /next\s*$/i,    :method => :command_next      # !next
+      match /next\s+(.+)/i, :method => :command_next      # !next <show>
+      match /schedule/i,    :method => :command_schedule  # !schedule
 
       def help
         [
@@ -53,9 +56,38 @@ module Cinch
         @events = @calendar.events
       end
 
+      def command_next(m, opts = '')
+        parsed_options = {
+          :tz => get_timezone_from_name('UTC')
+        }
+
+        begin
+          opts = opts.split /\s+/
+          opt_parser = OptionParser.new do |parser|
+            parser.on('-z', '--tz ZONE', 'ZONE required.') do |zone|
+              parsed_options[:tz] = get_timezone_from_name(zone)
+            end
+          end
+          opt_parser.parse!(opts)
+
+          named_show = opts.join(' ').strip
+          if named_show.empty?
+            next_show(m, parsed_options)
+          else
+            next_named_show(m, named_show, parsed_options)
+          end
+        rescue OptionParser::InvalidOption => ioe
+          m.user.send ioe.message
+        rescue OptionParser::MissingArgument => mae
+          m.user.send mae.message
+        rescue TZInfo::InvalidTimezoneIdentifier
+          m.user.send 'That is not a valid timezone. For a list of valid time zones, please see http://en.wikipedia.org/wiki/List_of_tz_database_time_zones'
+        end
+      end
+
       # Replies to the user with information about the next show
       # !next -> Next show is Linux Action Show in 3 hours 30 minutes (6/2/2011)
-      def command_next(m)
+      def next_show(m, opts)
         response = ""
 
         event = live_event
@@ -68,7 +100,7 @@ module Cinch
 
         if event
           response << "Next show is #{event.summary}"
-          response << " in #{in_how_long(event)}"
+          response << " in #{in_how_long(event, opts[:tz])}"
         else
           response << "No upcoming show found in the next week"
         end
@@ -78,7 +110,7 @@ module Cinch
 
       # Replies to the user with information about the next specified show
       # !next cr -> The next Coder Radio is in 3 hours 30 minutes (6/2/2011)
-      def command_next_show(m, show_keyword)
+      def next_named_show(m, show_keyword, opts)
         if show_keyword.strip.empty?
           command_next(m)
           return
@@ -106,7 +138,7 @@ module Cinch
         response = ""
 
         response << "The next #{event.summary} is"
-        response << " in #{in_how_long(event)}"
+        response << " in #{in_how_long(event, opts[:tz])}"
 
         m.reply response
       end
@@ -128,8 +160,18 @@ module Cinch
 
       protected
 
-      def in_how_long(event)
-        "#{event.fancy_time_until} (#{event.start_time_to_local_string} on #{event.start_date_to_local_string})"
+      def get_timezone_from_name(tz_name)
+        comparable_tz_name = tz_name.downcase
+
+        canonical_tz_name = TZInfo::Timezone.all_identifiers.select do |tz_identifier|
+          tz_identifier.downcase == comparable_tz_name
+        end.first
+
+        TZInfo::Timezone.get(canonical_tz_name)
+      end
+
+      def in_how_long(event, tz)
+        "#{event.fancy_time_until} (#{event.start_time_to_local_string(tz)} on #{event.start_date_to_local_string(tz)})"
       end
 
       # Get a live event if there is one, or nil
