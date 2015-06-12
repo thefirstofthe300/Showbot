@@ -68,7 +68,7 @@ module Cinch
 
         if event
           response << "Next show is #{event.summary}"
-          response << " in #{event.fancy_time_until} (#{event.start_time_to_local_string} on #{event.start_date_to_local_string})"
+          response << " in #{in_how_long(event)}"
         else
           response << "No upcoming show found in the next week"
         end
@@ -106,7 +106,7 @@ module Cinch
         response = ""
 
         response << "The next #{event.summary} is"
-        response << " in #{event.fancy_time_until} (#{event.start_time_to_local_string} on #{event.start_date_to_local_string})"
+        response << " in #{in_how_long(event)}"
 
         m.reply response
       end
@@ -127,6 +127,10 @@ module Cinch
       end
 
       protected
+
+      def in_how_long(event)
+        "#{event.fancy_time_until} (#{event.start_time_to_local_string} on #{event.start_date_to_local_string})"
+      end
 
       # Get a live event if there is one, or nil
       def live_event
