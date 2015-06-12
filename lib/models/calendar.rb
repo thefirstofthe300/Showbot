@@ -1,5 +1,6 @@
 require 'google/api_client'
 require 'chronic_duration'
+require 'tzinfo'
 
 # The Calendar module provides access to remote calendars to JBot plugins. It
 # currently pulls events from a Google Calendar as the default backend. The
@@ -148,13 +149,13 @@ module Calendar
     end
 
     # Convert start date to local string
-    def start_date_to_local_string
-      start_time.strftime("%A, %-m/%-d/%Y")
+    def start_date_to_local_string(tz = TZInfo::Timezone.get('UTC'))
+      tz.strftime("%A, %-m/%-d/%Y", start_time.utc)
     end
 
     # Convert start time to local string
-    def start_time_to_local_string
-      start_time.strftime("%-I:%M%P %Z")
+    def start_time_to_local_string(tz = TZInfo::Timezone.get('UTC'))
+      tz.strftime("%-I:%M%P %Z", start_time.utc)
     end
   end
 end
