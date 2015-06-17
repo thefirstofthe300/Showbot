@@ -41,7 +41,7 @@ module TwitterClient
     end
 
     def valid_twitter_user?(user)
-      user = user.downcase
+      user = as_comparable_handle user
       user_names.any? do |canonical_name|
         canonical_name.downcase == user
       end
@@ -83,8 +83,17 @@ module TwitterClient
 
     private
 
+    def strip_at_sign(handle)
+      handle = handle[1..-1] if handle[0] == '@'
+      handle
+    end
+
+    def as_comparable_handle(handle)
+      strip_at_sign handle.downcase
+    end
+
     def canonicalize_handle(handle)
-      handle = handle.downcase
+      handle = as_comparable_handle handle
       user_names.select do |canonical_handle|
         canonical_handle.downcase == handle
       end.first

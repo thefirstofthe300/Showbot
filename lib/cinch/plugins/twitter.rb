@@ -42,20 +42,13 @@ module Cinch
       end
 
       def command_last_status(m, user)
-        user = trim_at_sign user
-        last_status = @client.last_status_for user
-        if last_status.nil?
+        unless @client.valid_twitter_user? user
           m.user.send "Sorry, #{user} is not a user I know."
-        else
-          m.user.send last_status
+          return
         end
-      end
 
-      private
-
-      def trim_at_sign(user)
-        user = user[1..-1] if user[0] == '@'
-        user
+        last_status = @client.last_status_for(user) || "Sorry, I don't know #{user}'s last status."
+        m.user.send last_status
       end
     end
   end
