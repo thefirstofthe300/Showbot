@@ -57,6 +57,9 @@ plugins: &plugins
       :access_token_secret: "YOURACCESSTOKENSECRETHERE"
   -
     class: "Cinch::Plugins::Uptime"
+# The devtools plugin should only be used during development
+#  -
+#    class: "Cinch::Plugins::DevTools"
 
 # The base configuration, Freenode in the example configuration.
 network_base: &network_base
