@@ -80,9 +80,8 @@ servers:
     shared:
       Bot_Nick: "botname"
       Backup_Bot_Nick: "botname-backup"
-      Live_Url: "example.com/live"
-      Sinatra_Url: "http://www.example.com"
-      Twitter_User: "ExampleUser"
+      Live_Url: "localhost:5000/live"
+      Sinatra_Url: "http://localhost:5000"
   network_live:
     <<: *network_base
     nick: botname
@@ -93,4 +92,3 @@ servers:
       Backup_Bot_Nick: "botname-backup"
       Live_Url: "example.com/live"
       Sinatra_Url: "http://www.example.com"
-      Twitter_User: "ExampleUser"
