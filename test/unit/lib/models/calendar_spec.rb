@@ -1,6 +1,6 @@
 require 'rspec'
 
-require File.join File.dirname(__FILE__), '../../../lib/models/calendar.rb'
+require File.join Dir.pwd, 'lib/models/calendar.rb'
 
 describe Calendar::GoogleCalendar do
   before(:example) do

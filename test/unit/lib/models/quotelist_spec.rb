@@ -1,6 +1,6 @@
 require 'rspec'
 
-require File.join File.dirname(__FILE__), '../../../lib/models/quotelist.rb'
+require File.join Dir.pwd, 'lib/models/quotelist.rb'
 
 describe QuoteList do
   before(:context) do

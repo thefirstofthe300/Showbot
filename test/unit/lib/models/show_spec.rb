@@ -1,6 +1,6 @@
 require 'rspec'
 
-require File.join File.dirname(__FILE__), '../../../lib/models/show.rb'
+require File.join Dir.pwd, 'lib/models/show.rb'
 
 describe Show do
   before(:context) do

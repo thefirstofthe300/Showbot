@@ -1,6 +1,6 @@
 require 'rspec'
 
-require File.join File.dirname(__FILE__), '../../../lib/models/datajson.rb'
+require File.join Dir.pwd, 'lib/models/datajson.rb'
 
 describe DataJSON::DataJSON do
   before(:example) do
