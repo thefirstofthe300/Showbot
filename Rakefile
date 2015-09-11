@@ -10,6 +10,23 @@ namespace :test do
   end
 end
 
+namespace :spec do
+  begin
+    require 'rspec/core/rake_task'
+    RSpec::Core::RakeTask.new(:unit) do |spec|
+      spec.pattern = 'test/unit/**{,/*/**}/*_spec.rb'
+      spec.verbose = false
+    end
+
+    RSpec::Core::RakeTask.new(:acceptance) do |spec|
+      spec.pattern = 'test/acceptance/**{,/*/**}/*_spec.rb'
+      spec.verbose = false
+    end
+  rescue LoadError
+    # no rspec available
+  end
+end
+
 # -----------------------
 # Database
 # -----------------------

@@ -50,6 +50,10 @@ gem 'dm-types'
 gem 'dm-is-counter_cacheable'
 
 # Development Gems
+group :development, :test do
+  gem 'rspec'
+end
+
 group :development do
   gem 'dm-sqlite-adapter'
   gem 'foreman'
