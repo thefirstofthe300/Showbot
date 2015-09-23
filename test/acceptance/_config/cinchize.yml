@@ -17,7 +17,6 @@ plugins: &plugins
   - class: "Cinch::Plugins::Quotes"
     options:
       :quotes_file: 'config/quotes.yml'
-  - class: "Cinch::Plugins::Ltctick"
   - class: "Cinch::Plugins::Bittick"
 #  - class: "Cinch::Plugins::Identify"
 #    options:

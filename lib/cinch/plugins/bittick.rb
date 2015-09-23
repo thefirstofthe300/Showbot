@@ -1,34 +1,23 @@
 require 'open-uri'
 require 'json'
-#dirty hack because mtgox sucks and has an invalid cert - comment this when they fix their cert
 require 'openssl'
-#OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
 module Cinch
   module Plugins
     class Bittick
       include Cinch::Plugin
 
-#      listen_to :message
-      match /(goxtick)/i,                    :method => :command_goxtick
-      match /(btcetick)/i,                    :method => :command_btcetick
-      match /(bittick)/i,                    :method => :command_bittick
-      match /(bitavg)/i,                    :method => :command_bitavg
-      match /(dogetick)/i,                    :method => :command_dogetick
+      match /bittick/i,   :method => :command_btcetick
+      match /btcetick/i,  :method => :command_btcetick
+      match /bitavg/i,    :method => :command_bitavg
+      match /dogetick/i,  :method => :command_dogetick
+      match /litetick/i,  :method => :command_litetick
 
       def help
         [
-          '!goxtick - Bitcoin Ticker (MtGox)',
           '!bitavg - Bitcoin averages from bitcoinaveages.com',
           '!btcetick - Bitcoin Ticker (BTC-E)',
           '!dogetick - Dogecoin Ticker (BTer)'
-        ].join "\n"
-      end
-
-      def help_goxtick
-        [
-          '!goxtick - Bitcoin Ticker (MtGox)',
-          'Usage: !goxtick'
         ].join "\n"
       end
 
@@ -37,10 +26,6 @@ module Cinch
           '!btcetick - Bitcoin Ticker (BTC-E)',
           'Usage: !btcetick'
         ].join "\n"
-      end
-
-      def help_bittick
-        '!bittick is deprecated, please use !bitavg for the average across all exchanges, !goxtick for MtGox and !btcetick for BTC-E, thanks!'
       end
 
       def help_bitavg
@@ -57,28 +42,11 @@ module Cinch
         ].join "\n"
       end
 
-      def command_bittick(m)
-        m.user.send help_bittick
-      end
-
-      def command_goxtick(m)
-        goxjson = open('https://data.mtgox.com/api/2/BTCUSD/money/ticker').read
-        goxdata = JSON::parse(goxjson)["data"]
-        goxlast = goxdata["last"]
-        goxhigh = goxdata["high"]
-        goxlow = goxdata["low"]
-        goxvol = goxdata["vol"]
-        goxavg = goxdata["avg"]
-        goxsell = goxdata["sell"]
-
-# For 2.x
-        m.reply "#{Format(:blue,'MtGox:')} #{Format(:bold,'Average:')} #{Format(:orange,'%<average>s')} #{Format(:bold,'Last:')} #{Format(:orange,'%<last>s')} #{Format(:bold,'High:')} #{Format(:orange,'%<high>s')} #{Format(:bold,'Low:')} #{Format(:orange,'%<low>s')} #{Format(:bold,'Volume:')} #{Format(:orange,'%<vol>s')}" % {
-            average: goxavg['display'],
-            last: goxlast['display'],
-            high: goxhigh['display'],
-            low: goxlow['display'],
-            vol: goxvol['display']
-          }
+      def help_litetick
+        [
+          '!litetick - Litecoin Ticker (BTC-E)',
+          'Usage: !litetick'
+        ].join "\n"
       end
 
       def command_btcetick(m)
@@ -89,7 +57,6 @@ module Cinch
         btcedata["low"] =  "%.2f" % btcedata["low"]
         btcedata['vol'] = "%.2f" % btcedata['vol']
 
-# For 2.x
         m.reply "#{Format(:blue,'BTC-E:')} #{Format(:bold,'Average:')} #{Format(:orange,'$%<average>s')} #{Format(:bold,'Last:')} #{Format(:orange,'$%<last>s')} #{Format(:bold,'High:')} #{Format(:orange,'$%<high>s')} #{Format(:bold,'Low:')} #{Format(:orange,'$%<low>s')} #{Format(:bold,'Volume:')} #{Format(:orange,'$%<vol>s')}" % {
             average: btcedata['avg'].to_s.gsub(/(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/,'\1,\2'),
             last: btcedata['last'].to_s.gsub(/(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/,'\1,\2'),
@@ -103,7 +70,6 @@ module Cinch
         bitavgjson = open('https://api.bitcoinaverage.com/ticker/global/USD/').read
         bitavgdata = JSON::parse(bitavgjson)
 
-# For 2.x
         m.reply "#{Format(:blue,'BitcoinAverage:')} #{Format(:bold,'24h Average:')} #{Format(:orange,'$%<average>s')} #{Format(:bold,'Last:')} #{Format(:orange,'$%<last>s')} #{Format(:bold,'Ask:')} #{Format(:orange,'$%<ask>s')} #{Format(:bold,'Bid:')} #{Format(:orange,'$%<bid>s')} #{Format(:bold,'Volume:')} #{Format(:orange,'%<vol>s BTC')}" % {
             average: bitavgdata['24h_avg'],
             last: bitavgdata['last'],
@@ -124,6 +90,25 @@ module Cinch
             bid: dogedata['buy'],
             vol: dogedata['vol_doge'].to_s.gsub(/(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/,'\1,\2')
           }
+      end
+
+      def command_litetick(m)
+        json = open('https://btc-e.com/api/2/ltc_usd/ticker').read
+        data = JSON::parse(json)["ticker"]
+
+        last = "%0.2f" % data['last']
+        high = "%0.2f" % data['high']
+        low = "%0.2f" % data['low']
+        vol = data['vol'].to_s.reverse.scan(/(?:\d*\.)?\d{1,3}-?/).join(',').reverse
+        avg = "%0.2f" % data['avg']
+
+        m.reply "#{Format(:bold,'Average:')} #{Format(:orange,'$%<average>s')} #{Format(:bold,'Last:')} #{Format(:orange,'$%<last>s')} #{Format(:bold,'High:')} #{Format(:orange,'$%<high>s')} #{Format(:bold,'Low:')} #{Format(:orange,'$%<low>s')} #{Format(:bold,'Volume:')} #{Format(:orange,'%<vol>s LTC')}" % {
+          average: avg,
+          last: last,
+          high: high,
+          low: low,
+          vol: vol
+        }
       end
     end
   end

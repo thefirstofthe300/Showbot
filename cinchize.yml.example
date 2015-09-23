@@ -22,8 +22,6 @@ plugins: &plugins
       :password: "test" # Enter your password here
       :type: :nickserv # Most servers use nickserv, so setting this as the sane default.
   -
-    class: "Cinch::Plugins::Ltctick"
-  -
     class: "Cinch::Plugins::Links"
   -
     class: "Cinch::Plugins::LinkTitle"
