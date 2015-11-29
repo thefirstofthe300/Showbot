@@ -211,7 +211,7 @@ class SuggestionSet
   def initialize(slug = nil)
     @slug = slug
     @suggestions = []
-    super
+    super()
   end
 
   def add(show)

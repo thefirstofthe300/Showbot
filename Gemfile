@@ -1,10 +1,12 @@
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 
 # Regular
+gem 'activesupport', '<= 3.2.16'
 gem 'tzinfo'
 gem 'tzinfo-data'
 gem 'i18n'
 gem 'rake'
+gem 'dotenv'
 
 # Backups
 gem 'backup'
@@ -23,14 +25,16 @@ gem 'sass'
 gem 'coffee-script'
 gem 'execjs'
 gem 'therubyracer'
+gem 'eat'
 
 # Showbot Specific
 gem 'cinch'
 gem 'cinchize'
 gem 'chronic'
 gem 'chronic_duration'
-gem 'ri_cal'
 gem 'twitter'
+gem 'google-api-client'
+gem 'htmlentities'
 gem 'cinch-identify'
 gem 'stopwords', '0.2'
 
@@ -46,6 +50,10 @@ gem 'dm-types'
 gem 'dm-is-counter_cacheable'
 
 # Development Gems
+group :development, :test do
+  gem 'rspec'
+end
+
 group :development do
   gem 'dm-sqlite-adapter'
   gem 'foreman'

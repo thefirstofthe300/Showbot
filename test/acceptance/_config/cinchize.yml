@@ -1,0 +1,66 @@
+---
+# Plugins used for all configs
+plugins: &plugins
+  plugins:
+  - class: "Cinch::Plugins::DevTools"
+  - class: "Cinch::Plugins::Admin"
+    options:
+      :admins:
+        - "testrunner"
+      :shows_json: "public/shows.json"
+      :data_json: "public/data.json"
+  - class: "Cinch::Plugins::Help"
+  - class: "Cinch::Plugins::About"
+  - class: "Cinch::Plugins::Uptime"
+  - class: "Cinch::Plugins::StickyNick"
+  - class: "Cinch::Plugins::Bacon"
+  - class: "Cinch::Plugins::Quotes"
+    options:
+      :quotes_file: 'config/quotes.yml'
+  - class: "Cinch::Plugins::Bittick"
+#  - class: "Cinch::Plugins::Identify"
+#    options:
+#      :password: "test" # Enter your password here
+#      :type: :nickserv # Most servers use nickserv, so setting this as the sane default.
+  - class: "Cinch::Plugins::Links"
+  - class: "Cinch::Plugins::LinkTitle"
+  # This plugin requires authentication information for testing
+#  - class: "Cinch::Plugins::Schedule"
+#    options: # Customize these options to match your configuration
+#      :app_name: 'JBot'
+#      :app_version: '2.0.0'
+#      :api_key: 'YOUR-API-KEY-HERE' # CHANGE ME
+#      :calendar_id: 'YOUR-CALENDAR-ID-HERE' #CHANGE ME
+  - class: "Cinch::Plugins::Servers"
+  - class: "Cinch::Plugins::Suggestions"
+  - class: "Cinch::Plugins::Shoutcast"
+    options:
+      :shoutcast_uri: "http://www.example.com/"
+  # This plugin requires authentication information for testing
+#  - class: "Cinch::Plugins::Twitter"
+#    options:
+#      :users:
+#        - 'jupitersignal'
+#      :consumer_key: "YOUR-CONSUMER-KEY" # CHANGE ME
+#      :consumer_secret: "YOUR-CONSUMER-SECRET" # CHANGE ME
+#      :access_token: "YOUR-ACCESS-TOKEN" # CHANGE ME
+#      :access_token_secret: "YOUR-ACCESS-TOKEN-SECRET" # CHANGE ME
+
+options:
+    log_output: false
+    dir_mode: normal
+    dir: "pid"
+
+servers:
+  network_test:
+    <<: *plugins
+    server: localhost
+    port: 6667
+    nick: 'jbot-test'
+    channels:
+      - "#jb-test"
+    shared:
+      Bot_Nick: "jbot-test"
+      Backup_Bot_Nick: "jbot-test1"
+      Live_Url: "localhost:5000/live"
+      Sinatra_Url: "http://localhost:5000"

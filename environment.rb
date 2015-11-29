@@ -8,12 +8,12 @@ require 'dm-migrations'
 require 'haml'
 require 'sass'
 require 'i18n'
+require 'dotenv'
 
 require 'sinatra' unless defined?(Sinatra)
 
-LIVE_URL = ENV['DATA_JSON_URL']
-
 configure do
+  Dotenv.load
   Dir[File.join(Dir.pwd, 'locales', '*.yml')].each {|file| I18n.load_path << file }
   # Make sure only available locales are used. This will be the default in the
   # future but we need this to silence a deprecation warning
@@ -46,3 +46,5 @@ configure :test do
   DataMapper.auto_migrate!
   DataMapper.finalize
 end
+
+LIVE_URL = ENV['DATA_JSON_URL']

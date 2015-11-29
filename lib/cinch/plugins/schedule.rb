@@ -1,8 +1,8 @@
-# Query the schedule from an iCal store
+require 'optparse'
+require 'tzinfo'
 
-require 'chronic_duration'
 require './lib/models/shows'
-require './lib/models/ical_cache'
+require './lib/models/calendar'
 
 module Cinch
   module Plugins
@@ -11,72 +11,190 @@ module Cinch
 
       timer 600, :method => :refresh_calendar
 
-      match /next\s?(.*)/i,     :method => :command_next      # !next
-      match /schedule\s?(.*)/i, :method => :command_schedule  # !schedule
+      listen_to :connect, :method => :on_connect
+
+      match /next\s*$/i,    :method => :command_next      # !next
+      match /next\s+(.+)/i, :method => :command_next      # !next <show>
+      match /schedule/i,    :method => :command_schedule  # !schedule
+
+      def help
+        [
+          '!next - When\'s the next live show?',
+          '!schedule - What shows are being recorded live in the next seven days?'
+        ].join "\n"
+      end
+
+      def help_next
+        [
+          '!next - When\'s the next live show?',
+          'Usage: !next [show]'
+        ].join "\n"
+      end
+
+      def help_schedule
+        [
+          '!schedule - What shows are being recorded live in the next seven days?',
+          'Usage: !schedule'
+        ].join "\n"
+      end
 
       def initialize(*args)
         super
-        # This is a terrible hack to get access to a folder in the project directory
-        # TODO find a better way
-        @calendar = ICalCache.new config[:ical_uri]
-        # Get the inital data for the calendar
+        @calendar = Calendar.new(config)
+        @events = []
+      end
+
+      # A method called on connection to an IRC server
+      # Use to call any additional initialization
+      def on_connect(m)
         refresh_calendar
       end
 
-      # Refreshes calendar data
+      # Pulls in the latest calendar events and stores them in @events
+      # Called by a timer to keep up to date with the calendar
       def refresh_calendar
-        puts "Refreshing calendar data"
-        @calendar.refresh
+        @events = @calendar.events
+      end
+
+      def command_next(m, opts = '')
+        parsed_options = {
+          :tz => get_timezone_from_name('UTC')
+        }
+
+        begin
+          opts = opts.split /\s+/
+          opt_parser = OptionParser.new do |parser|
+            parser.on('-z', '--tz ZONE', 'ZONE required.') do |zone|
+              parsed_options[:tz] = get_timezone_from_name(zone)
+            end
+          end
+          opt_parser.parse!(opts)
+
+          named_show = opts.join(' ').strip
+          if named_show.empty?
+            next_show(m, parsed_options)
+          else
+            next_named_show(m, named_show, parsed_options)
+          end
+        rescue OptionParser::InvalidOption => ioe
+          m.user.send ioe.message
+        rescue OptionParser::MissingArgument => mae
+          m.user.send mae.message
+        rescue TZInfo::InvalidTimezoneIdentifier
+          m.user.send 'That is not a valid timezone. For a list of valid time zones, please see http://en.wikipedia.org/wiki/List_of_tz_database_time_zones'
+        end
       end
 
       # Replies to the user with information about the next show
-      # !next b2w -> The next Back to Work is in 3 hours 30 minutes (6/2/2011)
-      def command_next(m, show_keyword)
-        show = Shows.find_show(show_keyword) if show_keyword and !show_keyword.strip.empty?
+      # !next -> Next show is Linux Action Show in 3 hours 30 minutes (6/2/2011)
+      def next_show(m, opts)
+        response = ""
 
-        if show
-          next_event = @calendar.next_event(show.title)
-        else
-          next_event = @calendar.next_event
+        event = live_event
+
+        if event
+          response << "#{event.summary} is live right now! "
         end
 
-        if next_event
-          tz = TZInfo::Timezone.get('America/New_York')
-          time = tz.utc_to_local(next_event.start_time)
+        event = next_event
 
-          date_string = time.strftime("%A, %-m/%-d/%Y")
-          time_string = time.strftime("%-I:%M%P EST")
-          nearest_seconds_until = ((next_event.start_time - DateTime.now) * 24 * 60 * 60).to_i
-          if show
-            m.user.send "The next #{next_event.summary} is in #{ChronicDuration.output(nearest_seconds_until, :format => :long)} (#{time_string} on #{date_string})"
+        if event
+          response << "Next show is #{event.summary}"
+          response << " in #{in_how_long(event, opts[:tz])}"
+        else
+          response << "No upcoming show found in the next week"
+        end
+
+        m.reply response
+      end
+
+      # Replies to the user with information about the next specified show
+      # !next cr -> The next Coder Radio is in 3 hours 30 minutes (6/2/2011)
+      def next_named_show(m, show_keyword, opts)
+        if show_keyword.strip.empty?
+          command_next(m)
+          return
+        end
+
+        show = Shows.find_show(show_keyword)
+
+        if !show
+          if show_keyword.strip == "Robert'); DROP TABLE students;--"
+            m.reply "Oh, yes. Little Bobby Tables, we call him."
           else
-            m.user.send "Next show is #{next_event.summary} in #{ChronicDuration.output(nearest_seconds_until, :format => :long)} (#{time_string} on #{date_string})"
+            m.reply "Cannot find a show for #{show_keyword}"
           end
-        else
-          m.user.send "No upcoming show found for #{show.title}"
+
+          return
         end
 
+        event = next_event(show)
+
+        if !event
+          m.reply "No upcoming show found for #{show.title} in the next week"
+          return
+        end
+
+        response = ""
+
+        response << "The next #{event.summary} is"
+        response << " in #{in_how_long(event, opts[:tz])}"
+
+        m.reply response
       end
 
       # Replies with the schedule for the next 7 days of shows
-      def command_schedule(m, command)
-        upcoming_events = @calendar.upcoming_events
-
-        if command == "refresh"
-          refresh_calendar
-        elsif upcoming_events.length > 0
-          m.user.send "#{upcoming_events.length} upcoming show#{upcoming_events.length > 1 ? "s" : ""}"
-          upcoming_events.sort{|e1, e2| e1.start_time <=> e2.start_time}.each do |event|
-            tz = TZInfo::Timezone.get('America/New_York')
-            time = tz.utc_to_local(event.start_time)
-            date_string = time.strftime("%A, %-m/%-d/%Y")
-            time_string = time.strftime("%-I:%M%P EST")
-            m.user.send "  #{event.summary} on #{date_string} at #{time_string}"
-          end
+      def command_schedule(m)
+        if @events.empty?
+          m.user.send "No shows in the next week"
+          return
         end
 
+        m.user.send "#{@events.length} upcoming show#{@events.length > 1 ? "s" : ""} in the next week"
+
+        # Push only the next 10 shows to avoid flooding
+        @events[0...10].each do |event|
+          m.user.send "  #{event.summary} on #{event.start_date_to_local_string} at #{event.start_time_to_local_string}"
+        end
       end
 
+      protected
+
+      def get_timezone_from_name(tz_name)
+        comparable_tz_name = tz_name.downcase
+
+        canonical_tz_name = TZInfo::Timezone.all_identifiers.select do |tz_identifier|
+          tz_identifier.downcase == comparable_tz_name
+        end.first
+
+        TZInfo::Timezone.get(canonical_tz_name)
+      end
+
+      def in_how_long(event, tz)
+        "#{event.fancy_time_until} (#{event.start_time_to_local_string(tz)} on #{event.start_date_to_local_string(tz)})"
+      end
+
+      # Get a live event if there is one, or nil
+      def live_event
+        @events.select do |event|
+          event.covers? Time.now
+        end.first
+      end
+
+      # Gets the next event from the list of events
+      # If a show is provided, search the events for a summary that starts with
+      # show.title, and return the next event of that show
+      def next_event(show = nil)
+        if show.nil?
+          @events
+        else
+          @events.select do |event|
+            event.summary.start_with? show.title
+          end
+        end.select do |event|
+          event.after? Time.now
+        end.first
+      end
     end
   end
 end

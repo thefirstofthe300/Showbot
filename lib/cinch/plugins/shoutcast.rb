@@ -13,7 +13,18 @@ module Cinch
           "Icy-MetaData" => '1'
       }
 
-      match %r{(current|live|nowplaying)},   :method => :command_current    # !current
+      match /(?:current|live|nowplaying)/i, :method => :command_current # !current
+
+      def help
+        "!current - What's playing on #{shared[:Live_Url]}? I've got you covered."
+      end
+
+      def help_current
+        [
+          help,
+          'Usage: !current'
+        ].join "\n"
+      end
 
       def initialize(*args)
         super

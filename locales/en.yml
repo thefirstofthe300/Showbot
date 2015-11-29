@@ -1,7 +1,7 @@
 en:
   messages:
     models:
-      suggestion: That suggestion was too long. Bot is sorry. Think title, not transcript.
+      suggestion: That suggestion was too long. JBot is sorry. Think title, not transcript.
   views:
     clouds:
       cloud_data_empty: "No episodes found in that time frame."
@@ -12,35 +12,35 @@ en:
         other: "are %cloud_data_count clouds"
       out_of_bounds_end: " on the specified date."
     layout:
-      title: "Showbot"
-      meta_description: "Showbot displays title suggestions from users listening to the live http://5by5.tv podcasts. It gathers these suggestions from the #5by5 IRC channel."
+      title: "JBot"
+      meta_description: "JBot displays title suggestions from users listening to the live http://jupiterbroadcasting.com podcasts. It gathers these suggestions from the #jupiterbroadcasting IRC channel."
       meta_author: "Jeremy Mack"
-      header: "Showbot"
+      header: "JBot"
       heart: "<<span>3</span>"
       link_titles: "Titles"
       link_links: "Links"
       friendly:
-        message: "Showbot loves you."
+        message: "JBot loves you."
         alt: "Not like that."
       exist:
         message: "Why"
-        para_1: "The jackals in the 5by5 Chat think they know what the title "
-        para_2: "of the show should be. Showbot passes no judgements. Showbot collects"
-        para_3: " the title suggestions from IRC and shows them here. Showbot is here to help."
+        para_1: "People in the JB chat love to suggest titles for our shows, "
+        para_2: "so showbot collects and organizes these in an organized fashion to help "
+        para_3: "the staff make a decision. It also lets the community vote on the titles."
       who:
         message: "Who"
-        para_1: "Showbot was created by Jeremy Mack, <a href=\"http://twitter.com/mutewinter\">@mutewinter</a>."
-        para_2: "Showbot also receives love from coders in the 5by5 community on GitHub."
+        para_1: "Showbot was created by Jeremy Mack, <a href='http://twitter.com/mutewinter'>@mutewinter</a> and the coders on <a href='https://github.com/mutewinter/Showbot'>GitHub</a>."
+        para_2: "Showbot was adapted into JBot by <a href='http://twitter.com/rikailp'>@rikai</a>(<a href=''http://github.com/rikai''>GH</a>) in order to integrate it into the JB ecosystem."
       where:
         message: "Where"
-        para_1: "<a href=\"http://github.com/mutewinter/Showbot\">Showbot on GitHub</a>"
-        para_2: "<a href=\"http://5by5.tv/chat\">Showbot in IRC</a>"
-        para_3: "<a href=\"http://5by5.tv\">5by5.tv</a>"
+        para_1: "<a href='http://jupiterbroadcasting.com/'>Jupiter Broadcasting</a>"
+        para_2: "<a href='http://github.com/mutewinter/Showbot'>Showbot @ GitHub</a>"
+        para_3: "<a href='http://github.com/rikai/Showbot'>JBot @ GitHub</a>"
     links:
       links_count:
         one: "1 Link Suggestion in the last 24 hours"
         other: "%links.count Link Suggestions in the last 24 hours"
-      irc_help: In the <a href='http://5by5.tv/chat'>5by5 chat room</a>? Type <span class='code'>!link http://example.com</span> to suggest a link.
+      irc_help: In the <a href='http://jupiterbroadcasting.com/'>Jupiter Broadcasting chat room</a>? Type <span class='code'>!link http://example.com</span> to suggest a link.
       unknown_show: "Show Not Listed"
       zero: "No link suggestions yet"
     suggestion:
@@ -49,7 +49,7 @@ en:
           zero: "No title suggestions yet"
           one: "%{count} Title suggestion in the last 24 hours"
           other: "%{count} Title suggestions in the last 24 hours"
-        irc_help: In the <a href='http://5by5.tv/chat'>5by5 chat room</a>? Type <span class='code'>!suggest Wacky Title</span> to suggest a title.
+        irc_help: In the <a href='http://jupiterbroadcasting.com/'>jupiterbroadcasting chat room</a>? Type <span class='code'>!suggest Wacky Title</span> to suggest a title.
         view_mode:
           Bubbles: "Bubbles"
           Tables: "Tables"

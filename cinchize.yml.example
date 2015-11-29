@@ -1,0 +1,92 @@
+---
+# Plugins used for all configs
+plugins: &plugins
+  plugins:
+  -
+    class: "Cinch::Plugins::About"
+  -
+    class: "Cinch::Plugins::Admin"
+    options:
+      :data_json: "local/path/to/data.json"
+      :admins:
+        - "YourNickHere"
+  -
+    class: "Cinch::Plugins::Bacon"
+  -
+    class: "Cinch::Plugins::Bittick"
+  -
+    class: "Cinch::Plugins::Help"
+  -
+    class: "Cinch::Plugins::Identify"
+    options:
+      :password: "test" # Enter your password here
+      :type: :nickserv # Most servers use nickserv, so setting this as the sane default.
+  -
+    class: "Cinch::Plugins::Links"
+  -
+    class: "Cinch::Plugins::LinkTitle"
+  -
+    class: "Cinch::Plugins::Quotes"
+    options:
+      :quotes_file: 'your-quotes-file.yml'
+  -
+    class: "Cinch::Plugins::Schedule"
+    options: # Customize these options to match your configuration
+      :app_name: 'JBot'
+      :app_version: '2.0.0'
+      :api_key: 'YOURAPIKEYHERE'
+      :calendar_id: 'CALENDARIDHERE@group.calendar.google.com'
+  -
+    class: "Cinch::Plugins::Shoutcast"
+    options:
+      :shoutcast_uri: "http://www.example.com/"
+  -
+    class: "Cinch::Plugins::StickyNick"
+  -
+    class: "Cinch::Plugins::Suggestions"
+  -
+    class: "Cinch::Plugins::Twitter"
+    options:
+      :users: "test" # This can be a single user, or an array of Twitter users
+      # To get these values, you will need to register as a developer with Twitter
+      :consumer_key: "YOURCONSUMERKEYHERE"
+      :consumer_secret: "YOURCONSUMERSECRETHERE"
+      :access_token: "YOURACCESSTOKENHERE"
+      :access_token_secret: "YOURACCESSTOKENSECRETHERE"
+  -
+    class: "Cinch::Plugins::Uptime"
+# The devtools plugin should only be used during development
+#  -
+#    class: "Cinch::Plugins::DevTools"
+
+# The base configuration, Freenode in the example configuration.
+network_base: &network_base
+  <<: *plugins
+  server: irc.freenode.net
+  port: 6667
+
+options:
+    log_output: true
+    dir_mode: normal
+    dir: "pid"
+servers:
+  network_test:
+    <<: *network_base
+    nick: botname_test
+    channels:
+      - "#cinch-bots"
+    shared:
+      Bot_Nick: "botname"
+      Backup_Bot_Nick: "botname-backup"
+      Live_Url: "localhost:5000/live"
+      Sinatra_Url: "http://localhost:5000"
+  network_live:
+    <<: *network_base
+    nick: botname
+    channels:
+      - "#cinch-bots"
+    shared:
+      Bot_Nick: "botname"
+      Backup_Bot_Nick: "botname-backup"
+      Live_Url: "example.com/live"
+      Sinatra_Url: "http://www.example.com"

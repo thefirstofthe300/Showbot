@@ -5,7 +5,7 @@ require 'cinchize'
 
 
 # Required to parse the cinchize.yml file properly
-YAML::ENGINE.yamler = 'syck'
+YAML::ENGINE.yamler = 'psych'
 
 Options = {
   :ontop => true,

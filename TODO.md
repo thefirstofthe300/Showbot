@@ -10,20 +10,21 @@ Easy
 
 Moderate
 ---------
-- [ ] Fix bug in current scheduling system that sometimes gets the show dates wrongly because some ical flags are being ignored (possibly an upstream bug that needs to be addressed) - [Issue #4](https://github.com/rikai/Showbot/issues/4)
- - [ ] Actual solution might be to replace ri_cal, see third option in the next section.
+- [x] Fix bug in current scheduling system that sometimes gets the show dates wrongly because some ical flags are being ignored (possibly an upstream bug that needs to be addressed) - [Issue #4](https://github.com/rikai/Showbot/issues/4)
+ - [x] Actual solution might be to replace ri_cal, see third option in the next section.
 - [ ] Remove the dependency on therubyracer
  - [ ] one of the other execjs alternatives may work, just needs some testing to ensure there are no issues
 - [x] Add the ability to hot-reload plugins without restarting JBot
 - [ ] Add the sed module to the repo and correct its broken functionality
  - [ ]  Users can currently use sed on other users text and there is also no limit to the sed length, which causes spam issues
+- [ ] Make plugins that use `data.json` more robust
 
 Time Consuming
 ------------------
 
 - [x] Update to work with ruby 2.x
 - [ ] Write a small web frontend with user accounts to control data.json and and/remove from shows.json
-- [ ] Convert schedule system to using the gdata API for reading calendars rather than scraping ics with ri_cal
+- [x] Convert schedule system to using the gdata API for reading calendars rather than scraping ics with ri_cal
 - [ ] Convert the twitter module to the streaming API instead of polling
 - [ ] Add a Youtube module to push release notices to the IRC channel
 - [ ] Add a RSS module to push JB site releases to the IRC channel

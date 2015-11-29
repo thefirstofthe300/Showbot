@@ -5,19 +5,24 @@ module Cinch
     class Suggestions
       include Cinch::Plugin
 
-      match "help suggest",        :method => :command_help        # !help suggest
-      match /(?:suggest|s) (.+)/i, :method => :command_suggest     # !suggest Great Title Here
-
+      match /suggest\s+(.*)/i,  :method => :command_suggest       # !suggest Great Title Here
 
       # Show help for the suggestions module
-      def command_help(m)
-        m.user.send "Usage: !suggest Sweet Show Title"
+      def help
+        '!suggest - Be heard. Suggest a title for the live show.'
+      end
+
+      def help_suggest
+        [
+          help,
+          'Usage: !suggest Sweet Show Title'
+        ].join "\n"
       end
 
       # Add the user's suggestion to the database
       def command_suggest(m, title)
         if title.empty?
-          command_help(m)
+          m.user.send help_suggest
         else
           new_suggestion = Suggestion.create(
             :title      => title,
@@ -32,9 +37,7 @@ module Cinch
             end
           end
         end
-
       end
-
     end
   end
 end

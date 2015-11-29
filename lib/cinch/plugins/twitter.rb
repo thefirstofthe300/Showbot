@@ -1,104 +1,54 @@
 # A Cinch plugin for broadcasting Twitter updates to an IRC channel
-
-require 'chronic_duration'
-require 'twitter'
-        
-module Cinch	
+module Cinch
   module Plugins
     class Twitter
       include Cinch::Plugin
 
-      timer 60, :method => :send_last_status
+      listen_to :connect,   :method => :on_connect
 
-      match "last_status",   :method => :command_last_status
+      timer 60, :method =>  :poll_for_statuses
 
-      Client = ::Twitter::REST::Client.new do |c|
-        c.consumer_key = config[:twitter_consumer_key]
-        c.consumer_secret = config[:twitter_consumer_secret]
-        c.access_token = config[:twitter_access_token]
-        c.access_token_secret = config[:twitter_access_token_secret]
+      match /last_status$/i,        :method => :command_last_status_list
+      match /last_status\s+(.*)/i,  :method => :command_last_status
+
+      def help
+        "!last_status - The last tweet by @#{@client.user_names.join(", @")} delievered to you in IRC. Sweet."
+      end
+
+      def help_last_status
+        "#{help}\nUsage: !last_status <username>"
       end
 
       def initialize(*args)
         super
+        @client = TwitterClient.new config
+      end
 
-        @user = config[:twitter_user]
-        @channel = config[:channel]
-        @channel_test = config[:channel_test]
-        @twitter_user = nil
-        @status = {}
-        @last_sent_id = {}
-        @user.each do |z|
-          @last_sent_id[z] = nil
-          @status[z] = nil
+      def on_connect(m)
+        @client.update_all_statuses
+      end
+
+      def poll_for_statuses
+        updated_users = @client.update_all_statuses
+
+        updated_users.each do |user|
+          status = @client.last_status_for user
+          bot.channels.each_with_object(status.to_s, &:send)
         end
       end
 
-      def response_from_laststatus(status)
-        if status
-          created_at = status.created_at.to_datetime
-          seconds_ago = (Time.now - created_at.to_time).to_i
-          relative_time = ChronicDuration.output(seconds_ago, :format => :long)
-
-          return "@#{@twitter_laststatus_user}: #{status.text} (#{relative_time} ago)"
-        end
+      def command_last_status_list(m)
+        m.user.send "Here are the Twitter users I know: @#{@client.user_names.join(", @")}"
       end
 
-      # Send the last status for the TWITTER_USER to the user who requested it
-      def command_last_status(m)
-        @user.each do |z|
-          begin
-            status = Client.user_timeline(z).first
-            @twitter_laststatus_user = z
-            m.user.send response_from_laststatus(status)
-          rescue ::Twitter::Error::ServiceUnavailable
-            m.user.send "Oops, looks like Twitter's whale failed. Try again in a minute."
-          end
-        end
-      end
-
-      def send_last_status
-        @user.each do |z|
-          begin
-            @status[z] = Client.user_timeline(z).first
-          rescue ::Twitter::Error::ServiceUnavailable
-            puts "Error: Twitter is over capacity."
-            return
-          end
-
-          if @last_sent_id[z].nil?
-            # Skip the first message from TWITTER_USER so we don't spam every
-            # time the bot reconnects
-            @last_sent_id[z] = @status[z].id
-
-          elsif @last_sent_id[z] != @status[z].id
-
-            if @status[z].in_reply_to_status_id or @status[z].in_reply_to_screen_name
-              # Don't show replies
-              next
-            end
-
-            @last_sent_id[z] = @status[z].id
-            status = @status[z]
-            @twitter_user = z
-
-            if @bot.nick =~ /_test$/
-              Channel(@channel_test).send response_from_status(status)
-            else
-              Channel(@channel).send response_from_status(status)
-            end
-          end
+      def command_last_status(m, user)
+        unless @client.valid_twitter_user? user
+          m.user.send "Sorry, #{user} is not a user I know."
+          return
         end
 
-        def response_from_status(status)
-          if status
-            created_at = status.created_at.to_datetime
-            seconds_ago = (Time.now - created_at.to_time).to_i
-            relative_time = ChronicDuration.output(seconds_ago, :format => :long)
-
-            return "@#{@twitter_user}: #{status.text} (#{relative_time} ago)"
-          end
-        end
+        last_status = @client.last_status_for(user) || "Sorry, I don't know #{user}'s last status."
+        m.user.send last_status
       end
     end
   end
