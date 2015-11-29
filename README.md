@@ -22,9 +22,8 @@ follwing message once it is connected to an IRC network:
  * [RVM with Ruby 1.9.2 or Greater](https://rvm.io/)
  * [Bundler](http://gembundler.com/)
  * Git (for pulling down source from Github, alternately download a tarball)
- * SQLite3
- * MySQL
-
+ * SQLite3 (for development)
+ * MySQL (for production)
 ### Setup
 
 These commands will get you setup to run the stable version of Showbot.
