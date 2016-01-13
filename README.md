@@ -24,6 +24,7 @@ follwing message once it is connected to an IRC network:
  * Git (for pulling down source from Github, alternately download a tarball)
  * SQLite3 (for development)
  * MySQL (for production)
+
 ### Setup
 
 These commands will get you setup to run the stable version of Showbot.
