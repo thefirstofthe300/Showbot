@@ -2,7 +2,7 @@
   - suggestions = suggestion_set.suggestions
   .clear
   = suggestion_set_hr(suggestion_set)
-  .suggestions_table
+  .suggestions_table{"data-show-slug" => suggestion_set.slug}
     .total="#{suggestions.count} Title#{suggestions.count == 1 ? '' : 's'}"
     %table.sortable.zebra-striped
       %thead

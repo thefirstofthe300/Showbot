@@ -1,9 +1,7 @@
+
 jQuery(document).ready(->
   # Timeago and Tipsy
-  $("abbr.timeago").timeago().show().timeago().tipsy(
-    gravity: 'w'
-    fade: true
-  )
+  refresh_timeago()
 
   # Modernizr
   if (Modernizr.touch)
@@ -19,13 +17,18 @@ jQuery(document).ready(->
     sortList: [[0,1]]
   )
 
-  # Setup Votes
   setup_voting()
+  connect_to_socket()
 )
 
+refresh_timeago = ->
+  $("abbr.timeago").timeago().show().timeago().tipsy(
+    gravity: 'w'
+    fade: true
+  )
 
 # Extract text from cells that aren't normal
-# 
+#
 # Returns a String of text that represents the cell for sorting purposes.
 table_text_extraction = (element) ->
   $element = $(element)
@@ -41,6 +44,31 @@ table_text_extraction = (element) ->
     text = $element.find('.vote_count').html()
 
   text
+
+update_votes = (response) ->
+  if arguments.length == 3
+    $link = arguments[1]
+    $vote_count = arguments[2]
+  else
+    $link = $('a.vote_up')
+    $vote_count = $link.siblings('.vote_count').first()
+
+  vote_amount = parseInt(response.votes)
+  if isNaN(vote_amount)
+    $vote_count.addClass('error')
+  else
+    $vote_count.text(vote_amount)
+
+  if response.cluster_top
+    $link.closest('tr').children('.cluster-votes').text(response.cluster_votes)
+  else
+    $link.closest('tr')
+      .siblings('#cluster-' + response.cluster_id)
+      .children('.cluster-votes')
+      .text(response.cluster_votes)
+
+  # Update the sort cache so the table will sort based on the new vote value
+  $link.parents('table').trigger('update')
 
 setup_voting = ->
   $('a.vote_up').live('click', (e) ->
@@ -65,22 +93,65 @@ setup_voting = ->
           -> $vote_arrow.remove()
           800 # 0.2 seconds less than animation due to hide
         )
-        vote_amount = parseInt(response.votes)
-        if isNaN(vote_amount)
-          $vote_count.addClass('error')
-        else
-          $vote_count.text(vote_amount)
 
-          if response.cluster_top
-            $link.closest('tr').children('.cluster-votes').text(response.cluster_votes)
-          else
-            $link.closest('tr').siblings('#cluster-' + response.cluster_id).children('.cluster-votes').text(response.cluster_votes)
-        
-        # Update the sort cache so the table will sort based on the new vote
-        # value
-        $link.parents('table').trigger('update')
+        update_votes(response, $link, $vote_count)
+
     , "json").error(->
       $vote_count.removeClass('voted')
       $vote_count.addClass('error')
     )
   )
+
+add_title_to_table = (msg) ->
+  tbody_sel =
+    ".suggestions_table[data-show-slug='" + msg.show_slug + "'] tbody"
+  $tbody = $(tbody_sel)
+  if $tbody.length == 0
+    # Expect to fail to find the table if this is the first tile.
+    # Page reload should render out the table and the title that
+    # triggered this update. Table should be found on subsequent
+    # updates
+    location.reload()
+  else
+    $tbody.append(msg.trl)
+    refresh_timeago()
+    $table = $tbody.closest('table')
+
+    ############################################################
+    # HACK: We need to explicitly trigger a sort based on its current
+    # state, but doing so immediately after calling an update results
+    # in a race condition that can corrupt the sort of the table.
+    # Sitting it behind a 10ms delay allows update to finish before
+    # executing the sort, but this is obviously not ideal.
+    #
+    # Proper way to handle this:
+    # update.then(sortFn) via `onUpdate` event, which afaik, does not
+    # exist and needs to be hacked in to tablesorter.
+    ############################################################
+    $table.trigger('update')
+    sortFn = -> $table.trigger('sorton', [$table[0].config.sortList])
+    setTimeout(sortFn, 10) # Queue sort
+    ############################################################
+
+connect_to_socket = ->
+  SOCKET_PATH = '/socket'
+  document.ws = new WebSocket('ws://' + window.location.host + SOCKET_PATH)
+  ws = document.ws
+  ws.onopen = -> console.log('Frontside ws cx open!')
+  ws.onclose = -> console.log('Frontside ws cx closed!')
+  ws.onmessage = (raw_msg) ->
+    msg = JSON.parse(raw_msg.data)
+    if !msg.action?
+      console.log('Got bad message, missing action')
+      return
+
+    # Dispatch action
+    if msg.action == 'upvote'
+      update_votes(msg)
+    else if msg.action == 'new_title'
+      add_title_to_table(msg)
+    else # Unknown action
+      # Swallow? Not much the user can do here, we're in a bad state.
+      # Could attempt to renegotiate cx, or reload page (nuclear option!)
+      # Not expecting to hit this branch.
+      console.log('Got bad message, unknown action')

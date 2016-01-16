@@ -5,7 +5,9 @@
 require 'bundler/setup'
 require 'coffee_script'
 require 'sinatra' unless defined?(Sinatra)
-require "sinatra/reloader" if development?
+require 'sinatra/reloader' if development?
+require 'sinatra-websocket'
+require 'pry-remote'
 
 require 'json'
 
@@ -16,6 +18,8 @@ SHOWS_JSON = File.expand_path(File.join(File.dirname(__FILE__), "public", "shows
 SAMPLE_TITLES_JSON = File.expand_path("hypercritical.json")
 
 class ShowbotWeb < Sinatra::Base
+  set :open_sockets, {}
+
   configure do
     set :public_folder, "#{File.dirname(__FILE__)}/public"
     set :views, "#{File.dirname(__FILE__)}/views"
@@ -58,6 +62,11 @@ class ShowbotWeb < Sinatra::Base
     end
   end
 
+  get '/new_title_trigger' do
+    title_id = params[:id]
+    self.broadcast_new_title(title_id)
+  end
+
   get '/links' do
     @title = "Suggested Links in the last 24 hours"
     @links = Link.recent.all(:order => [:created_at.desc])
@@ -77,10 +86,14 @@ class ShowbotWeb < Sinatra::Base
       suggestion = Suggestion.get(params[:id])
       cluster_top = suggestion.top_of_cluster? # figure out if top before adding new vote
       suggestion.vote_up(request.ip)
-      {votes: suggestion.votes.count.to_s,
+      response = {
+        votes: suggestion.votes.count.to_s,
         cluster_top: cluster_top,
         cluster_id: suggestion.cluster_id,
-        cluster_votes: suggestion.total_for_cluster}.to_json
+        cluster_votes: suggestion.total_for_cluster
+      }
+      self.broadcast_upvote(request, response)
+      response.to_json
     else
       redirect '/'
     end
@@ -216,6 +229,87 @@ class ShowbotWeb < Sinatra::Base
       }.to_json
     end
   end
+
+  # ------------------
+  # Sockets
+  # ------------------
+  #
+  def broadcast_upvote(request, response)
+    logger.info "Broadcasting to all connected sockets aside from #{request.ip}"
+
+    response['action'] = 'upvote'
+    EM.next_tick do
+      settings.open_sockets.each do |k,v|
+        if k == request.ip then next else v.send(response.to_json) end
+      end
+    end
+  end
+
+  def broadcast_new_title(title_id)
+    suggestion = Suggestion.get(title_id)
+
+    timeago_engine = Haml::Engine.new(File.read(
+      "#{File.dirname(__FILE__)}/views/suggestion/_timeago.haml"))
+    timeago_render = timeago_engine.render(self, {
+      datetime: suggestion.created_at
+    })
+
+    trl_engine = Haml::Engine.new(File.read(
+      "#{File.dirname(__FILE__)}/views/suggestion/_table_row_live.haml"))
+    trl_render = trl_engine.render(self, {
+      suggestion: suggestion,
+      timeago: timeago_render
+    })
+
+    response = {
+      action: 'new_title',
+      show_slug: suggestion.show,
+      trl: trl_render
+    }
+
+    EM.next_tick do
+      settings.open_sockets.each do |k,v|
+        v.send(response.to_json)
+      end
+    end
+  end
+
+  get '/socket' do
+    if !request.websocket?
+      # Bad request, should hit this endpoint unless it's a websocket request
+      status 400
+    else
+      request.websocket do |ws|
+        ws.onopen do
+          # Add client to manifest
+          settings.open_sockets[request.ip] = ws
+        end
+
+        ws.onclose do
+          # Cleanup after client disconnects
+          settings.open_sockets.delete(request.ip)
+        end
+
+        ########################################
+        # NOTE: No real need for the server to
+        # accept incomming socket messages. Upvotes
+        # continue to be delivered by standard AJAX
+        # and we'll just broadcast to hosts we're
+        # aware of that the event occurred.
+        ########################################
+        #ws.onmessage do |msg|
+          # Multicast
+          #EM.next_tick do
+            #settings.open_sockets.each do |k,v|
+              #if k == request.ip then next else v.send(msg.to_json) end
+            #end
+          #end
+        #end
+        ########################################
+      end
+    end
+  end
+
 
   # ------------------
   # Helpers

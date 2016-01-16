@@ -18,6 +18,7 @@ gem 'mail', '~> 2.5.0'
 
 # Web
 gem 'sinatra'
+gem 'sinatra-websocket'
 gem 'sinatra-reloader'
 gem 'thin'
 gem 'haml'
@@ -59,6 +60,8 @@ group :development do
   gem 'foreman'
   gem 'rb-fsevent'
   gem 'irbtools-more'
+  gem 'pry'
+  gem 'pry-remote'
 end
 
 group :test do
