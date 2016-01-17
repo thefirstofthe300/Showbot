@@ -60,8 +60,6 @@ group :development do
   gem 'foreman'
   gem 'rb-fsevent'
   gem 'irbtools-more'
-  gem 'pry'
-  gem 'pry-remote'
 end
 
 group :test do

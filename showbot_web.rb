@@ -7,7 +7,6 @@ require 'coffee_script'
 require 'sinatra' unless defined?(Sinatra)
 require 'sinatra/reloader' if development?
 require 'sinatra-websocket'
-require 'pry-remote'
 
 require 'json'
 
