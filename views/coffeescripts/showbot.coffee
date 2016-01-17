@@ -27,6 +27,22 @@ refresh_timeago = ->
     fade: true
   )
 
+force_resort = ($table)->
+  ############################################################
+  # HACK: We need to explicitly trigger a sort based on its current
+  # state, but doing so immediately after calling an update results
+  # in a race condition that can corrupt the sort of the table.
+  # Sitting it behind a 10ms delay allows update to finish before
+  # executing the sort, but this is obviously not ideal.
+  #
+  # Proper way to handle this:
+  # update.then(sortFn) via `onUpdate` event, which afaik, does not
+  # exist and needs to be hacked in to tablesorter.
+  ############################################################
+  $table.trigger('update')
+  sortFn = -> $table.trigger('sorton', [$table[0].config.sortList])
+  setTimeout(sortFn, 10) # Queue sort
+
 # Extract text from cells that aren't normal
 #
 # Returns a String of text that represents the cell for sorting purposes.
@@ -44,31 +60,6 @@ table_text_extraction = (element) ->
     text = $element.find('.vote_count').html()
 
   text
-
-update_votes = (response) ->
-  if arguments.length == 3
-    $link = arguments[1]
-    $vote_count = arguments[2]
-  else
-    $link = $('a.vote_up')
-    $vote_count = $link.siblings('.vote_count').first()
-
-  vote_amount = parseInt(response.votes)
-  if isNaN(vote_amount)
-    $vote_count.addClass('error')
-  else
-    $vote_count.text(vote_amount)
-
-  if response.cluster_top
-    $link.closest('tr').children('.cluster-votes').text(response.cluster_votes)
-  else
-    $link.closest('tr')
-      .siblings('#cluster-' + response.cluster_id)
-      .children('.cluster-votes')
-      .text(response.cluster_votes)
-
-  # Update the sort cache so the table will sort based on the new vote value
-  $link.parents('table').trigger('update')
 
 setup_voting = ->
   $('a.vote_up').live('click', (e) ->
@@ -115,23 +106,49 @@ add_title_to_table = (msg) ->
   else
     $tbody.append(msg.trl)
     refresh_timeago()
-    $table = $tbody.closest('table')
+    increment_title_counts()
+    force_resort($tbody.closest('table'))
 
-    ############################################################
-    # HACK: We need to explicitly trigger a sort based on its current
-    # state, but doing so immediately after calling an update results
-    # in a race condition that can corrupt the sort of the table.
-    # Sitting it behind a 10ms delay allows update to finish before
-    # executing the sort, but this is obviously not ideal.
-    #
-    # Proper way to handle this:
-    # update.then(sortFn) via `onUpdate` event, which afaik, does not
-    # exist and needs to be hacked in to tablesorter.
-    ############################################################
-    $table.trigger('update')
-    sortFn = -> $table.trigger('sorton', [$table[0].config.sortList])
-    setTimeout(sortFn, 10) # Queue sort
-    ############################################################
+update_votes = (response) ->
+  if arguments.length == 3
+    # Upvote originated locally
+    $link = arguments[1]
+    $vote_count = arguments[2]
+  else
+    # Live update branch
+    link_sel =
+      "tr[data-suggestion-id='" + response.suggestion_id + "'] a.vote_up"
+    $link = $(link_sel)
+    $vote_count = $link.siblings('.vote_count').first()
+
+  vote_amount = parseInt(response.votes)
+  if isNaN(vote_amount)
+    $vote_count.addClass('error')
+  else
+    $vote_count.text(vote_amount)
+
+  if response.cluster_top
+    $link.closest('tr').children('.cluster-votes').text(response.cluster_votes)
+  else
+    $link.closest('tr')
+      .siblings('#cluster-' + response.cluster_id)
+      .children('.cluster-votes')
+      .text(response.cluster_votes)
+
+  force_resort($link.parents('table'))
+
+increment_title_counts = ->
+  increment_title = ($el) ->
+    title_count_rgx = /(\d+)( Title.*)$/
+
+    $el.each((idx, el) ->
+      match = title_count_rgx.exec($(el).text())
+      match[1] = parseInt(match[1]) + 1
+      $el.text(match[1] + match[2])
+    )
+
+  increment_title($('#content h2.subtitle'))
+  increment_title($('#titles .suggestions_table .total'))
 
 connect_to_socket = ->
   SOCKET_PATH = '/socket'

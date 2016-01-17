@@ -13,5 +13,5 @@
           %th.header= t('views.suggestion._table_set.When')
       %tbody
         - suggestions.each do |suggestion|
-          %tr
+          %tr{"data-suggestion-id" => suggestion.id}
             = haml :'suggestion/_table_row', :locals => {suggestion: suggestion}

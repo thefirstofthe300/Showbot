@@ -87,6 +87,7 @@ class ShowbotWeb < Sinatra::Base
       cluster_top = suggestion.top_of_cluster? # figure out if top before adding new vote
       suggestion.vote_up(request.ip)
       response = {
+        suggestion_id: suggestion.id,
         votes: suggestion.votes.count.to_s,
         cluster_top: cluster_top,
         cluster_id: suggestion.cluster_id,
