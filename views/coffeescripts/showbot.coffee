@@ -21,28 +21,6 @@ jQuery(document).ready(->
   connect_to_socket()
 )
 
-refresh_timeago = ->
-  $("abbr.timeago").timeago().show().timeago().tipsy(
-    gravity: 'w'
-    fade: true
-  )
-
-force_resort = ($table)->
-  ############################################################
-  # HACK: We need to explicitly trigger a sort based on its current
-  # state, but doing so immediately after calling an update results
-  # in a race condition that can corrupt the sort of the table.
-  # Sitting it behind a 10ms delay allows update to finish before
-  # executing the sort, but this is obviously not ideal.
-  #
-  # Proper way to handle this:
-  # update.then(sortFn) via `onUpdate` event, which afaik, does not
-  # exist and needs to be hacked in to tablesorter.
-  ############################################################
-  $table.trigger('update')
-  sortFn = -> $table.trigger('sorton', [$table[0].config.sortList])
-  setTimeout(sortFn, 10) # Queue sort
-
 # Extract text from cells that aren't normal
 #
 # Returns a String of text that represents the cell for sorting purposes.
@@ -93,21 +71,43 @@ setup_voting = ->
     )
   )
 
-add_title_to_table = (msg) ->
-  tbody_sel =
-    ".suggestions_table[data-show-slug='" + msg.show_slug + "'] tbody"
-  $tbody = $(tbody_sel)
-  if $tbody.length == 0
-    # Expect to fail to find the table if this is the first tile.
-    # Page reload should render out the table and the title that
-    # triggered this update. Table should be found on subsequent
-    # updates
-    location.reload()
-  else
-    $tbody.append(msg.trl)
-    refresh_timeago()
-    increment_title_counts()
-    force_resort($tbody.closest('table'))
+connect_to_socket = ->
+  SOCKET_PATH = '/socket'
+  document.ws = new WebSocket('ws://' + window.location.host + SOCKET_PATH)
+  ws = document.ws
+  ws.onopen = -> console.log('Frontside ws cx open!')
+  ws.onclose = -> console.log('Frontside ws cx closed!')
+  ws.onmessage = (raw_msg) ->
+    view_mode = $('ul.segmented_controls > li.selected').attr('id')
+    msg = JSON.parse(raw_msg.data)
+    if !msg.action?
+      console.log('Got bad message, missing action')
+      return
+
+    dispatcher =
+      table:
+        upvote: update_votes
+        new_title: add_title_to_table
+      bubble:
+        upvote: -> console.log('NOT_YET_IMPLEMENTED: bubble_upvote')
+        new_title: add_title_to_bubble
+      clusters:
+        upvote: -> console.log('NOT_YET_IMPLEMENTED: clusters_upvote')
+        new_title: -> console.log('NOT_YET_IMPLEMENTED: clusters_new_title')
+
+    # Dispatch message to handlers
+    try
+      dispatcher[view_mode][msg.action](msg)
+    catch err
+      # Deliberately avoiding a rethrow here since a bad msg is not a critical failure
+      console.log('ERROR: Something went wrong during socket msg dispatch.')
+      console.log(err)
+      console.log(raw_msg)
+      console.log('Check view mode and make sure action is registered with dispatcher.')
+
+############################################################
+# Message Handlers
+############################################################
 
 update_votes = (response) ->
   if arguments.length == 3
@@ -137,6 +137,55 @@ update_votes = (response) ->
 
   force_resort($link.parents('table'))
 
+add_title_to_table = (msg) ->
+  tbody_sel =
+    ".suggestions_table[data-show-slug='" + msg.show_slug + "'] tbody"
+  $tbody = $(tbody_sel)
+  if $tbody.length == 0
+    # Expect to fail to find the table if this is the first tile.
+    # Page reload should render out the table and the title that
+    # triggered this update. Table should be found on subsequent
+    # updates
+    location.reload()
+  else
+    $tbody.append(msg.trl)
+    refresh_timeago()
+    increment_title_counts()
+    force_resort($tbody.closest('table'))
+
+add_title_to_bubble = (msg) ->
+  # !! TODO: IMPL NO OL FIND PAGE RELOAD
+  $ol = $("#titles ol[data-show-slug='"+ msg.show_slug + "']")
+
+  # Reclear list given newly prepended bubble
+  $ol.prepend(msg.bubble_live)
+  $ol.children('li').detach().each((idx, li) ->
+    if idx != 0 and idx % 3 == 0
+      $ol.append('<div class="clear"></div>')
+    $ol.append(li)
+  )
+  refresh_timeago()
+
+############################################################
+# Helpers
+############################################################
+
+force_resort = ($table)->
+  ############################################################
+  # HACK: We need to explicitly trigger a sort based on its current
+  # state, but doing so immediately after calling an update results
+  # in a race condition that can corrupt the sort of the table.
+  # Sitting it behind a 10ms delay allows update to finish before
+  # executing the sort, but this is obviously not ideal.
+  #
+  # Proper way to handle this:
+  # update.then(sortFn) via `onUpdate` event, which afaik, does not
+  # exist and needs to be hacked in to tablesorter.
+  ############################################################
+  $table.trigger('update')
+  sortFn = -> $table.trigger('sorton', [$table[0].config.sortList])
+  setTimeout(sortFn, 10) # Queue sort
+
 increment_title_counts = ->
   increment_title = ($el) ->
     title_count_rgx = /(\d+)( Title.*)$/
@@ -150,25 +199,9 @@ increment_title_counts = ->
   increment_title($('#content h2.subtitle'))
   increment_title($('#titles .suggestions_table .total'))
 
-connect_to_socket = ->
-  SOCKET_PATH = '/socket'
-  document.ws = new WebSocket('ws://' + window.location.host + SOCKET_PATH)
-  ws = document.ws
-  ws.onopen = -> console.log('Frontside ws cx open!')
-  ws.onclose = -> console.log('Frontside ws cx closed!')
-  ws.onmessage = (raw_msg) ->
-    msg = JSON.parse(raw_msg.data)
-    if !msg.action?
-      console.log('Got bad message, missing action')
-      return
+refresh_timeago = ->
+  $("abbr.timeago").timeago().show().timeago().tipsy(
+    gravity: 'w'
+    fade: true
+  )
 
-    # Dispatch action
-    if msg.action == 'upvote'
-      update_votes(msg)
-    else if msg.action == 'new_title'
-      add_title_to_table(msg)
-    else # Unknown action
-      # Swallow? Not much the user can do here, we're in a bad state.
-      # Could attempt to renegotiate cx, or reload page (nuclear option!)
-      # Not expecting to hit this branch.
-      console.log('Got bad message, unknown action')

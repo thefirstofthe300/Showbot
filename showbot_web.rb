@@ -248,6 +248,21 @@ class ShowbotWeb < Sinatra::Base
   def broadcast_new_title(title_id)
     suggestion = Suggestion.get(title_id)
 
+    response = {
+      action: 'new_title',
+      show_slug: suggestion.show,
+      trl: self.trl_render(suggestion),
+      bubble_live: self.bubble_live_render(suggestion, request)
+    }
+
+    EM.next_tick do
+      settings.open_sockets.each do |k,v|
+        v.send(response.to_json)
+      end
+    end
+  end
+
+  def trl_render(suggestion)
     timeago_engine = Haml::Engine.new(File.read(
       "#{File.dirname(__FILE__)}/views/suggestion/_timeago.haml"))
     timeago_render = timeago_engine.render(self, {
@@ -256,22 +271,26 @@ class ShowbotWeb < Sinatra::Base
 
     trl_engine = Haml::Engine.new(File.read(
       "#{File.dirname(__FILE__)}/views/suggestion/_table_row_live.haml"))
-    trl_render = trl_engine.render(self, {
+    trl_engine.render(self, {
       suggestion: suggestion,
       timeago: timeago_render
     })
+  end
 
-    response = {
-      action: 'new_title',
-      show_slug: suggestion.show,
-      trl: trl_render
-    }
+  def bubble_live_render(suggestion, request)
+    timeago_engine = Haml::Engine.new(File.read(
+      "#{File.dirname(__FILE__)}/views/suggestion/_timeago.haml"))
+    timeago_render = timeago_engine.render(self, {
+      datetime: suggestion.created_at
+    })
 
-    EM.next_tick do
-      settings.open_sockets.each do |k,v|
-        v.send(response.to_json)
-      end
-    end
+    bubble_engine = Haml::Engine.new(File.read(
+      "#{File.dirname(__FILE__)}/views/suggestion/_bubble_live.haml"))
+    bubble_engine.render(self, {
+      suggestion: suggestion,
+      timeago: timeago_render,
+      request: request
+    })
   end
 
   get '/socket' do
@@ -343,7 +362,9 @@ class ShowbotWeb < Sinatra::Base
     end
 
     def suggestion_set_hr(suggestion_set)
-      "<h2 class='show_break'>#{show_title_for_slug(suggestion_set.slug)}</h2>"
+      html = ''
+      html << "<h2 class='show_break'>"
+      html << "#{show_title_for_slug(suggestion_set.slug)}</h2>"
     end
 
     def link_to_vote_up(suggestion)
