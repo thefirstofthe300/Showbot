@@ -78,7 +78,14 @@ connect_to_socket = ->
   ws.onopen = -> console.log('Frontside ws cx open!')
   ws.onclose = -> console.log('Frontside ws cx closed!')
   ws.onmessage = (raw_msg) ->
-    view_mode = $('ul.segmented_controls > li.selected').attr('id')
+    $seg_ctrl = $('ul.segmented_controls > li.selected')
+    if $seg_ctrl.length == 0
+      # No titles for *any* show are available, reload the page
+      # so we get a first entry.
+      location.reload()
+    else
+      view_mode = $seg_ctrl.attr('id')
+
     msg = JSON.parse(raw_msg.data)
     if !msg.action?
       console.log('Got bad message, missing action')
@@ -142,10 +149,8 @@ add_title_to_table = (msg) ->
     ".suggestions_table[data-show-slug='" + msg.show_slug + "'] tbody"
   $tbody = $(tbody_sel)
   if $tbody.length == 0
-    # Expect to fail to find the table if this is the first tile.
-    # Page reload should render out the table and the title that
-    # triggered this update. Table should be found on subsequent
-    # updates
+    # Even if the seg controls are found, it's still possible this is
+    # the first suggestion for a new show, in which case force reload.
     location.reload()
   else
     $tbody.append(msg.trl)
@@ -154,8 +159,9 @@ add_title_to_table = (msg) ->
     force_resort($tbody.closest('table'))
 
 add_title_to_bubble = (msg) ->
-  # !! TODO: IMPL NO OL FIND PAGE RELOAD
   $ol = $("#titles ol[data-show-slug='"+ msg.show_slug + "']")
+  if $ol.length == 0
+    location.reload()
 
   # Reclear list given newly prepended bubble
   $ol.prepend(msg.bubble_live)
