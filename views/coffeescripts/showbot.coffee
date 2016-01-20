@@ -93,10 +93,21 @@ connect_to_socket = ->
 
     dispatcher =
       table:
-        upvote: update_votes
+        upvote: (msg)->
+          link_sel =
+            "tr[data-suggestion-id='" + msg.suggestion_id + "'] a.vote_up"
+          $link = $(link_sel)
+          $vote_count = $link.siblings('.vote_count').first()
+          update_votes(msg, $link, $vote_count)
+          force_resort($link.parents('table'))
         new_title: add_title_to_table
       bubble:
-        upvote: -> console.log('NOT_YET_IMPLEMENTED: bubble_upvote')
+        upvote: (msg) ->
+          link_sel =
+            "ol a[data-id='" + msg.suggestion_id + "'].vote_up"
+          $link = $(link_sel)
+          $vote_count = $link.siblings('.vote_count').first()
+          update_votes(msg, $link, $vote_count)
         new_title: add_title_to_bubble
       clusters:
         upvote: -> console.log('NOT_YET_IMPLEMENTED: clusters_upvote')
@@ -123,10 +134,6 @@ update_votes = (response) ->
     $vote_count = arguments[2]
   else
     # Live update branch
-    link_sel =
-      "tr[data-suggestion-id='" + response.suggestion_id + "'] a.vote_up"
-    $link = $(link_sel)
-    $vote_count = $link.siblings('.vote_count').first()
 
   vote_amount = parseInt(response.votes)
   if isNaN(vote_amount)
@@ -141,8 +148,6 @@ update_votes = (response) ->
       .siblings('#cluster-' + response.cluster_id)
       .children('.cluster-votes')
       .text(response.cluster_votes)
-
-  force_resort($link.parents('table'))
 
 add_title_to_table = (msg) ->
   tbody_sel =
