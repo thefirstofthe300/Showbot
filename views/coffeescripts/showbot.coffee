@@ -75,8 +75,8 @@ connect_to_socket = ->
   SOCKET_PATH = '/socket'
   document.ws = new WebSocket('ws://' + window.location.host + SOCKET_PATH)
   ws = document.ws
-  ws.onopen = -> console.log('Frontside ws cx open!')
-  ws.onclose = -> console.log('Frontside ws cx closed!')
+  ws.onopen = -> $('span.live-indicator').show()
+  ws.onclose = -> $('span.live-indicator').hide()
   ws.onmessage = (raw_msg) ->
     $seg_ctrl = $('ul.segmented_controls > li.selected')
     if $seg_ctrl.length == 0

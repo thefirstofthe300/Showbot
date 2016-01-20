@@ -21,10 +21,11 @@
           .banner DEVELOPMENT MODE
           .banner_push
       #header
-        %h1.logo
+        %h1.logo{:style => 'float: left'}
           %a{:href => '/'}=t('views.layout.header')
           -# display:none so the heart doesn't briefly show
           .heart{:style => 'display:none;'}=t('views.layout.heart')
+        %span.live-indicator{:style => "display: none; color: green; float: left; margin: 33px 0 0 -20px"} live!
         %nav
           %ul
             %li
