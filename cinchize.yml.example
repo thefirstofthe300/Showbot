@@ -1,4 +1,12 @@
 ---
+test_hosts: &test_hosts
+  Live_Url: "localhost:5000/live"
+  Sinatra_Url: "http://localhost:5000"
+
+live_hosts: &live_hosts
+  Live_Url: "example.com/live"
+  Sinatra_Url: "http://www.example.com"
+
 # Plugins used for all configs
 plugins: &plugins
   plugins:
@@ -44,6 +52,13 @@ plugins: &plugins
     class: "Cinch::Plugins::StickyNick"
   -
     class: "Cinch::Plugins::Suggestions"
+    options:
+      live_titles:
+        enabled: true
+        test_hosts:
+          <<: *test_hosts
+        live_hosts:
+          <<: *live_hosts
   -
     class: "Cinch::Plugins::Twitter"
     options:
@@ -78,8 +93,7 @@ servers:
     shared:
       Bot_Nick: "botname"
       Backup_Bot_Nick: "botname-backup"
-      Live_Url: "localhost:5000/live"
-      Sinatra_Url: "http://localhost:5000"
+      <<: *test_hosts
   network_live:
     <<: *network_base
     nick: botname
@@ -88,5 +102,4 @@ servers:
     shared:
       Bot_Nick: "botname"
       Backup_Bot_Nick: "botname-backup"
-      Live_Url: "example.com/live"
-      Sinatra_Url: "http://www.example.com"
+      <<: *live_hosts
