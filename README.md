@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/rikai/Showbot.png?label=ready&title=Ready)](https://waffle.io/rikai/Showbot)
 # JBot
 
 A sweet IRC bot with a **web interface** for [Jupiter Broadcasting](http://www.jupiterbroadcasting.com/).
