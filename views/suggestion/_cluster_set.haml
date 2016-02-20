@@ -23,5 +23,5 @@
                   %tr{:class => "expand-child child-cluster-#{child_suggestion.cluster_id}"}
                     = haml :'suggestion/_cluster_table_row', :locals => {suggestion: child_suggestion, cluster_top: false}
           - else
-            %tr
+            %tr{"data-sg-id" => suggestion.id}
               = haml :'suggestion/_cluster_table_row', :locals => {suggestion: suggestion, cluster_top: true}
