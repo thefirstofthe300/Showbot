@@ -365,6 +365,10 @@ ul.segmented_controls {
   text-align: right;
 }
 
+tr.cluster-top td.title {
+  cursor: pointer;
+}
+
 .expanded-arrow {
   background-position: 0 -19px;
 }
