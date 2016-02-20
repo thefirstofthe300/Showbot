@@ -1,5 +1,7 @@
 
 jQuery(document).ready(->
+  init_cluster_arrow_handler($('tr.cluster-top').children('td.title'))
+
   # Timeago and Tipsy
   refresh_timeago()
 
@@ -111,7 +113,31 @@ connect_to_socket = ->
         new_title: add_title_to_bubble
       clusters:
         upvote: -> console.log('NOT_YET_IMPLEMENTED: clusters_upvote')
-        new_title: -> console.log('NOT_YET_IMPLEMENTED: clusters_new_title')
+        new_title: (msg)->
+          # TODO: IMPORTANT: Need to take the current show in to account!
+          if msg.cluster.id # New title belongs to an existing cluster
+            if msg.cluster.new_cluster
+              # Suggestions added to the list that aren't already part of a cluster will be
+              # missing any cluster data (naturally, since they aren't already part of a cluster)
+              # Server provides that suggestions ID so we can identify this scenario and hot swap
+              # that suggestion with the new cluster render
+              osg_sel = 'tr[data-sg-id="' + msg.cluster.new_cluster.orig_sg_id + '"]'
+              $(osg_sel).replaceWith(msg.cluster.render)
+              init_cluster_arrow_handler(
+                $('tr.cluster-top#cluster-' + msg.cluster.id).children('td.title'))
+            else
+              # If this is not a new cluster, we should be able to find the existing one based on meta
+              # TODO: Capture current state of the table and modify the inmemory table to match before
+              # replacing
+              old_tr_sel = "tr#cluster-" + msg.cluster.id + ",tr.child-cluster-" + msg.cluster.id
+              $old_tr = $(old_tr_sel)
+              $parent = $old_tr.parent()
+              $(old_tr_sel).remove()
+              $parent.prepend(msg.cluster.render)
+              init_cluster_arrow_handler(
+                $('tr.cluster-top#cluster-' + msg.cluster.id).children('td.title'))
+          else
+            $('.suggestions_table tbody').append(msg.cluster.render)
 
     # Dispatch message to handlers
     try
@@ -216,3 +242,10 @@ refresh_timeago = ->
     fade: true
   )
 
+init_cluster_arrow_handler = ($titles)->
+  $titles
+    .attr('title', 'Click to expand/collapse')
+    .click(->
+      $(this).parent().siblings('.child-'+this.parentElement.id).toggle()
+      $(this).find('.cluster-arrow').toggleClass('expand-arrow')
+    )

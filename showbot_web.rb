@@ -100,7 +100,6 @@ class ShowbotWeb < Sinatra::Base
   end
 
   # Word cloud generation
-
   get '/clouds_between/:days_a/:days_b' do
     days_ago = [params[:days_a].to_i, params[:days_b].to_i].sort
     suggestion_sets = Suggestion.all(:created_at => ( (DateTime.now - days_ago[1])..(DateTime.now - days_ago[0]) ), :order => [:created_at.desc]).group_by_show
@@ -248,11 +247,28 @@ class ShowbotWeb < Sinatra::Base
   def broadcast_new_title(title_id)
     suggestion = Suggestion.get(title_id)
 
+    cluster = {
+      id: nil,
+      render: self.cluster_live_render(suggestion, request),
+      new_cluster: nil
+    }
+
+    if suggestion.in_cluster?
+      sgs = suggestion.cluster.suggestions
+      cluster[:id] = suggestion.cluster.id
+      if(sgs.length == 2)
+        cluster[:new_cluster] = {
+          orig_sg_id: sgs.select{|sg| sg.id != suggestion.id}.first.id
+        }
+      end
+    end
+
     response = {
       action: 'new_title',
       show_slug: suggestion.show,
       trl: self.trl_render(suggestion),
-      bubble_live: self.bubble_live_render(suggestion, request)
+      bubble_live: self.bubble_live_render(suggestion, request),
+      cluster: cluster
     }
 
     EM.next_tick do
@@ -262,33 +278,72 @@ class ShowbotWeb < Sinatra::Base
     end
   end
 
-  def trl_render(suggestion)
+
+  def timeago_render(created_at)
     timeago_engine = Haml::Engine.new(File.read(
       "#{File.dirname(__FILE__)}/views/suggestion/_timeago.haml"))
-    timeago_render = timeago_engine.render(self, {
-      datetime: suggestion.created_at
+    timeago_engine.render(self, {
+      datetime: created_at
     })
+  end
 
+  def trl_render(suggestion)
     trl_engine = Haml::Engine.new(File.read(
       "#{File.dirname(__FILE__)}/views/suggestion/_table_row_live.haml"))
     trl_engine.render(self, {
       suggestion: suggestion,
-      timeago: timeago_render
+      timeago: timeago_render(suggestion.created_at)
     })
   end
 
   def bubble_live_render(suggestion, request)
-    timeago_engine = Haml::Engine.new(File.read(
-      "#{File.dirname(__FILE__)}/views/suggestion/_timeago.haml"))
-    timeago_render = timeago_engine.render(self, {
-      datetime: suggestion.created_at
-    })
-
     bubble_engine = Haml::Engine.new(File.read(
       "#{File.dirname(__FILE__)}/views/suggestion/_bubble_live.haml"))
     bubble_engine.render(self, {
       suggestion: suggestion,
-      timeago: timeago_render,
+      timeago: timeago_render(suggestion.created_at),
+      request: request
+    })
+  end
+
+  def cluster_live_render(suggestion, request)
+    cluster_engine = Haml::Engine.new(File.read(
+      "#{File.dirname(__FILE__)}/views/suggestion/live_cluster/_cluster.haml"))
+    cluster_engine.render(self, {
+      suggestion: suggestion,
+      cluster: self.cluster_struct_for_suggestion(suggestion, request)
+    })
+  end
+
+  def cluster_struct_for_suggestion(suggestion, request)
+        #.select{|sg| sg.id != suggestion.id }
+    if suggestion.in_cluster?
+      suggestion.cluster.suggestions
+        .map do |sg|
+          {
+            suggestion: sg,
+            belongs_to_cluster: true,
+            is_top: sg.top_of_cluster?,
+            render: self.live_cluster_row_render(sg, request)
+          }
+        end
+        .sort{|lhs, rhs| lhs[:is_top] ? -1 : 1} # Ensure top item is first row
+    else
+      [{
+        suggestion: suggestion,
+        belongs_to_cluster: false,
+        is_top: true,
+        render: self.live_cluster_row_render(suggestion, request)
+      }]
+    end
+  end
+
+  def live_cluster_row_render(suggestion, request)
+    cluster_row_engine = Haml::Engine.new(File.read(
+      "#{File.dirname(__FILE__)}/views/suggestion/live_cluster/_cluster_table_row.haml"))
+    cluster_row_engine.render(self, {
+      timeago: timeago_render(suggestion.created_at),
+      suggestion: suggestion,
       request: request
     })
   end
