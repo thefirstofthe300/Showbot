@@ -16,7 +16,7 @@
         - suggestions.each do |suggestion|
           - if suggestion.in_cluster?
             - if suggestion.top_of_cluster?
-              %tr{:class => "cluster-top", :id => "cluster-#{suggestion.cluster_id}"}
+              %tr{:class => "cluster-top", :id => "cluster-#{suggestion.cluster_id}", "data-expansion-state" => "closed"}
                 = haml :'suggestion/_cluster_table_row', :locals => {suggestion: suggestion, cluster_top: true}
               - suggestion.cluster.suggestions.each do |child_suggestion|
                 - if child_suggestion.id != suggestion.id

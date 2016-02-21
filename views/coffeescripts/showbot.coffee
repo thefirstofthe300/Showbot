@@ -93,6 +93,8 @@ connect_to_socket = ->
       console.log('Got bad message, missing action')
       return
 
+    # TODO: Need to address the case where a new title is added and it's
+    # associated with a show that isn't already live.
     dispatcher =
       table:
         upvote: (msg)->
@@ -114,7 +116,6 @@ connect_to_socket = ->
       clusters:
         upvote: -> console.log('NOT_YET_IMPLEMENTED: clusters_upvote')
         new_title: (msg)->
-          # TODO: IMPORTANT: Need to take the current show in to account!
           if msg.cluster.id # New title belongs to an existing cluster
             if msg.cluster.new_cluster
               # Suggestions added to the list that aren't already part of a cluster will be
@@ -127,13 +128,22 @@ connect_to_socket = ->
                 $('tr.cluster-top#cluster-' + msg.cluster.id).children('td.title'))
             else
               # If this is not a new cluster, we should be able to find the existing one based on meta
-              # TODO: Capture current state of the table and modify the inmemory table to match before
-              # replacing
+              # TODO: Respect sort order?
               old_tr_sel = "tr#cluster-" + msg.cluster.id + ",tr.child-cluster-" + msg.cluster.id
               $old_tr = $(old_tr_sel)
+
+              # Examine current expansion state and prep render so we don't close it if already open
+              expansion_state = $old_tr.attr('data-expansion-state')
+              $render = $($.parseHTML(msg.cluster.render))
+              if expansion_state == 'open'
+                $render.filter('.cluster-top').attr('data-expansion-state', 'open')
+                $render.find('.cluster-arrow').toggleClass('expanded-arrow')
+                $render.filter('.child-cluster-' + msg.cluster.id).css('display', 'table-row')
+
               $parent = $old_tr.parent()
               $(old_tr_sel).remove()
-              $parent.prepend(msg.cluster.render)
+
+              $parent.prepend($render)
               init_cluster_arrow_handler(
                 $('tr.cluster-top#cluster-' + msg.cluster.id).children('td.title'))
           else
@@ -246,6 +256,12 @@ init_cluster_arrow_handler = ($titles)->
   $titles
     .attr('title', 'Click to expand/collapse')
     .click(->
-      $(this).parent().siblings('.child-'+this.parentElement.id).toggle()
-      $(this).find('.cluster-arrow').toggleClass('expand-arrow')
+      $tr = $(this).parent()
+      $tr.siblings('.child-'+this.parentElement.id).toggle()
+      $(this).find('.cluster-arrow').toggleClass('expanded-arrow')
+      if $tr.attr('data-expansion-state') == 'closed'
+        new_state = 'open'
+      else
+        new_state = 'closed'
+      $tr.attr('data-expansion-state', new_state)
     )
