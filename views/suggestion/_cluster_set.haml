@@ -16,11 +16,11 @@
         - suggestions.each do |suggestion|
           - if suggestion.in_cluster?
             - if suggestion.top_of_cluster?
-              %tr{:class => "cluster-top", :id => "cluster-#{suggestion.cluster_id}", "data-expansion-state" => "closed"}
+              %tr{:class => "cluster-top", :id => "cluster-#{suggestion.cluster_id}", "data-expansion-state" => "closed", "data-sg-id" => suggestion.id}
                 = haml :'suggestion/_cluster_table_row', :locals => {suggestion: suggestion, cluster_top: true}
               - suggestion.cluster.suggestions.each do |child_suggestion|
                 - if child_suggestion.id != suggestion.id
-                  %tr{:class => "expand-child child-cluster-#{child_suggestion.cluster_id}"}
+                  %tr{:class => "expand-child child-cluster-#{child_suggestion.cluster_id}", "data-sg-id" => child_suggestion.id}
                     = haml :'suggestion/_cluster_table_row', :locals => {suggestion: child_suggestion, cluster_top: false}
           - else
             %tr{"data-sg-id" => suggestion.id}

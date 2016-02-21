@@ -114,42 +114,16 @@ connect_to_socket = ->
           update_votes(msg, $link, $vote_count)
         new_title: add_title_to_bubble
       clusters:
-        upvote: -> console.log('NOT_YET_IMPLEMENTED: clusters_upvote')
-        new_title: (msg)->
-          if msg.cluster.id # New title belongs to an existing cluster
-            if msg.cluster.new_cluster
-              # Suggestions added to the list that aren't already part of a cluster will be
-              # missing any cluster data (naturally, since they aren't already part of a cluster)
-              # Server provides that suggestions ID so we can identify this scenario and hot swap
-              # that suggestion with the new cluster render
-              osg_sel = 'tr[data-sg-id="' + msg.cluster.new_cluster.orig_sg_id + '"]'
-              $(osg_sel).replaceWith(msg.cluster.render)
-              init_cluster_arrow_handler(
-                $('tr.cluster-top#cluster-' + msg.cluster.id).children('td.title'))
-            else
-              # If this is not a new cluster, we should be able to find the existing one based on meta
-              # TODO: Respect sort order?
-              old_tr_sel = "tr#cluster-" + msg.cluster.id + ",tr.child-cluster-" + msg.cluster.id
-              $old_tr = $(old_tr_sel)
+        upvote: (msg) ->
+          $tr = $('tr[data-sg-id="' + msg.suggestion_id + '"]')
+          $tr.find('td.votes span.vote_count').text(msg.votes)
 
-              # Examine current expansion state and prep render so we don't close it if already open
-              expansion_state = $old_tr.attr('data-expansion-state')
-              $render = $($.parseHTML(msg.cluster.render))
-              if expansion_state == 'open'
-                $render.filter('.cluster-top').attr('data-expansion-state', 'open')
-                $render.find('.cluster-arrow').toggleClass('expanded-arrow')
-                $render.filter('.child-cluster-' + msg.cluster.id).css('display', 'table-row')
-
-              $parent = $old_tr.parent()
-              $(old_tr_sel).remove()
-
-              $parent.prepend($render)
-              init_cluster_arrow_handler(
-                $('tr.cluster-top#cluster-' + msg.cluster.id).children('td.title'))
+          if !msg.cluster_id # suggestion does not belong to a cluster
+            $tr.find('td.cluster-votes').text(msg.cluster_votes)
           else
-            $('.suggestions_table tbody').append(msg.cluster.render)
-
-          increment_title_counts()
+            $('#cluster-' + msg.cluster_id).find('td.cluster-votes')
+              .text(msg.cluster_votes)
+        new_title: add_title_to_cluster
 
     # Dispatch message to handlers
     try
@@ -214,6 +188,42 @@ add_title_to_bubble = (msg) ->
     $ol.append(li)
   )
   refresh_timeago()
+
+add_title_to_cluster = (msg) ->
+  if msg.cluster.id # New title belongs to an existing cluster
+    if msg.cluster.new_cluster
+      # Suggestions added to the list that aren't already part of a cluster will be
+      # missing any cluster data (naturally, since they aren't already part of a cluster)
+      # Server provides that suggestions ID so we can identify this scenario and hot swap
+      # that suggestion with the new cluster render
+      osg_sel = 'tr[data-sg-id="' + msg.cluster.new_cluster.orig_sg_id + '"]'
+      $(osg_sel).replaceWith(msg.cluster.render)
+      init_cluster_arrow_handler(
+        $('tr.cluster-top#cluster-' + msg.cluster.id).children('td.title'))
+    else
+      # If this is not a new cluster, we should be able to find the existing one based on meta
+      # TODO: Respect sort order?
+      old_tr_sel = "tr#cluster-" + msg.cluster.id + ",tr.child-cluster-" + msg.cluster.id
+      $old_tr = $(old_tr_sel)
+
+      # Examine current expansion state and prep render so we don't close it if already open
+      expansion_state = $old_tr.attr('data-expansion-state')
+      $render = $($.parseHTML(msg.cluster.render))
+      if expansion_state == 'open'
+        $render.filter('.cluster-top').attr('data-expansion-state', 'open')
+        $render.find('.cluster-arrow').toggleClass('expanded-arrow')
+        $render.filter('.child-cluster-' + msg.cluster.id).css('display', 'table-row')
+
+      $parent = $old_tr.parent()
+      $(old_tr_sel).remove()
+
+      $parent.prepend($render)
+      init_cluster_arrow_handler(
+        $('tr.cluster-top#cluster-' + msg.cluster.id).children('td.title'))
+  else
+    $('.suggestions_table tbody').append(msg.cluster.render)
+
+  increment_title_counts()
 
 ############################################################
 # Helpers
