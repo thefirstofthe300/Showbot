@@ -149,6 +149,8 @@ connect_to_socket = ->
           else
             $('.suggestions_table tbody').append(msg.cluster.render)
 
+          increment_title_counts()
+
     # Dispatch message to handlers
     try
       dispatcher[view_mode][msg.action](msg)
@@ -234,6 +236,8 @@ force_resort = ($table)->
   setTimeout(sortFn, 10) # Queue sort
 
 increment_title_counts = ->
+  is_cluster_mode = $('.view_mode #clusters').hasClass('selected')
+
   increment_title = ($el) ->
     title_count_rgx = /(\d+)( Title.*)$/
 
@@ -244,7 +248,10 @@ increment_title_counts = ->
     )
 
   increment_title($('#content h2.subtitle'))
-  increment_title($('#titles .suggestions_table .total'))
+  if is_cluster_mode
+    update_cluster_count()
+  else
+    increment_title($('#titles .suggestions_table .total'))
 
 refresh_timeago = ->
   $("abbr.timeago").timeago().show().timeago().tipsy(
@@ -265,3 +272,15 @@ init_cluster_arrow_handler = ($titles)->
         new_state = 'closed'
       $tr.attr('data-expansion-state', new_state)
     )
+
+update_cluster_count = ->
+  group_count = $('tr.cluster-top, tr[data-sg-id]').length
+  title_count = $('tbody tr').length
+
+  count_str = if title_count == 1
+  then title_count + ' Title'
+  else title_count + ' Titles'
+
+  count_str += ' in ' + group_count + ' Group'
+
+  $('.suggestions_table .total').text(count_str)
