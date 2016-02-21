@@ -7,6 +7,6 @@
       %tr{:class => "expand-child child-cluster-#{cstruct[:suggestion].cluster_id}", :style => "display: none"}
         = cstruct[:render]
   - else
-    %tr{"data-sg-id" => suggestion.id, :style => "border: 1px solid green"}
+    %tr{"data-sg-id" => suggestion.id}
       = cstruct[:render]
 
