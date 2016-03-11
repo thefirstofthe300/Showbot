@@ -5,7 +5,9 @@ require 'cinchize'
 
 
 # Required to parse the cinchize.yml file properly
-YAML::ENGINE.yamler = 'psych'
+if RUBY_VERSION < '1.9.3'
+  YAML::ENGINE.yamler = 'psych' 
+end
 
 Options = {
   :ontop => true,
