@@ -90,6 +90,23 @@ body {
     -ms-transform: rotate(-90deg);
     -o-transform: rotate(-90deg);
     transform: rotate(-90deg); }
+#header button.live-mode-toggle {
+  display: inline-block;
+  border-radius: 4px;
+  margin: 30px 0 0 5px;
+  /* Gotta make room for the lhs heart! */
+  color: #FFF;
+  border: none;
+  font: inherit;
+  cursor: pointer; }
+#header button.live-mode-toggle.live-is-on {
+  background-color: #990808; }
+#header button.live-mode-toggle.live-is-on:hover {
+  background-color: #8C0707; }
+#header button.live-mode-toggle.live-is-off {
+  background-color: #41BA53; }
+#header button.live-mode-toggle.live-is-off:hover {
+  background-color: #1CBA33; }
 
 nav {
   float: right;

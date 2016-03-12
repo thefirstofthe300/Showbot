@@ -20,7 +20,9 @@ jQuery(document).ready(->
   )
 
   setup_voting()
-  connect_to_socket()
+
+  if document.__jb['live_mode_enabled']
+    init_live_mode()
 )
 
 # Extract text from cells that aren't normal
@@ -73,78 +75,125 @@ setup_voting = ->
     )
   )
 
-connect_to_socket = ->
+############################################################
+# Live Mode
+############################################################
+on_ws_open = -> console.log('Live websocket opened.')
+on_ws_close = -> console.log('Live websocket closed.')
+
+on_ws_message = (raw_msg) ->
+  $seg_ctrl = $('ul.segmented_controls > li.selected')
+  if $seg_ctrl.length == 0
+    # No titles for *any* show are available, reload the page
+    # so we get a first entry.
+    location.reload()
+  else
+    view_mode = $seg_ctrl.attr('id')
+
+  msg = JSON.parse(raw_msg.data)
+  if !msg.action?
+    console.log('Got bad message, missing action')
+    return
+
+  # TODO: Need to address the case where a new title is added and it's
+  # associated with a show that isn't already live.
+  dispatcher =
+    table:
+      upvote: (msg)->
+        link_sel =
+          "tr[data-suggestion-id='" + msg.suggestion_id + "'] a.vote_up"
+        $link = $(link_sel)
+        $vote_count = $link.siblings('.vote_count').first()
+        update_votes(msg, $link, $vote_count)
+        force_resort($link.parents('table'))
+      new_title: add_title_to_table
+    bubble:
+      upvote: (msg) ->
+        link_sel =
+          "ol a[data-id='" + msg.suggestion_id + "'].vote_up"
+        $link = $(link_sel)
+        $vote_count = $link.siblings('.vote_count').first()
+        update_votes(msg, $link, $vote_count)
+      new_title: add_title_to_bubble
+    clusters:
+      upvote: (msg) ->
+        $tr = $('tr[data-sg-id="' + msg.suggestion_id + '"]')
+        $tr.find('td.votes span.vote_count').text(msg.votes)
+
+        if !msg.cluster_id # suggestion does not belong to a cluster
+          $tr.find('td.cluster-votes').text(msg.cluster_votes)
+        else
+          # Update total cluster count
+          $toptr = $('#cluster-' + msg.cluster_id)
+          $toptr.find('td.cluster-votes').text(msg.cluster_votes)
+
+          # If the suggestion isn't already at the top of the cluster, and another
+          # title has overtaken its count as the top suggestion, we need to rebuild
+          # the cluster
+          is_sugg_already_top = msg.suggestion_id == $toptr.data('sg-id')
+          top_vote_count = $toptr.find('span.vote_count').text()
+          should_rebuild_cluster = msg.votes > top_vote_count
+
+          if !is_sugg_already_top && should_rebuild_cluster
+            rebuild_cluster(msg, $toptr)
+      new_title: add_title_to_cluster
+
+  # Dispatch message to handlers
+  try
+    dispatcher[view_mode][msg.action](msg)
+  catch err
+    # Deliberately avoiding a rethrow here since a bad msg is not a critical failure
+    console.log('ERROR: Something went wrong during socket msg dispatch.')
+    console.log(err)
+    console.log(raw_msg)
+    console.log('Check view mode and make sure action is registered with dispatcher.')
+
+toggle_live_mode_on = ->
+  $btn = $('button.live-mode-toggle')
+
+  if($btn.hasClass('live-is-off'))
+    # If the page has been explicitly disabled previously, it's possible some updates
+    # have been missed. Instead of just proceeding forwards with missing data or trying
+    # to recover live, just reload the page and you'll be caught up with live mode on
+    console.log('Refreshing the page because live has been disabled for some time!')
+    location.reload()
+
   SOCKET_PATH = '/socket'
   document.ws = new WebSocket('ws://' + window.location.host + SOCKET_PATH)
   ws = document.ws
-  ws.onopen = -> $('span.live-indicator').show()
-  ws.onclose = -> $('span.live-indicator').hide()
-  ws.onmessage = (raw_msg) ->
-    $seg_ctrl = $('ul.segmented_controls > li.selected')
-    if $seg_ctrl.length == 0
-      # No titles for *any* show are available, reload the page
-      # so we get a first entry.
-      location.reload()
+  ws.onopen = on_ws_open
+  ws.onclose = on_ws_close
+  ws.onmessage = on_ws_message
+
+  $btn.text('Disable live mode')
+  $btn.removeClass('live-is-off')
+  $btn.addClass('live-is-on')
+
+  document.__jb.live_mode_enabled = true
+
+toggle_live_mode_off = ->
+  $btn = $('button.live-mode-toggle')
+
+  document.ws.close()
+  document.ws = null
+
+  $btn.text('Enable live mode')
+  $btn.removeClass('live-is-on')
+  $btn.addClass('live-is-off')
+
+  document.__jb.live_mode_enabled = false
+
+hook_up_live_toggle = ->
+  $('button.live-mode-toggle').click(->
+    if document.__jb.live_mode_enabled
+      toggle_live_mode_off()
     else
-      view_mode = $seg_ctrl.attr('id')
+      toggle_live_mode_on()
+  )
 
-    msg = JSON.parse(raw_msg.data)
-    if !msg.action?
-      console.log('Got bad message, missing action')
-      return
-
-    # TODO: Need to address the case where a new title is added and it's
-    # associated with a show that isn't already live.
-    dispatcher =
-      table:
-        upvote: (msg)->
-          link_sel =
-            "tr[data-suggestion-id='" + msg.suggestion_id + "'] a.vote_up"
-          $link = $(link_sel)
-          $vote_count = $link.siblings('.vote_count').first()
-          update_votes(msg, $link, $vote_count)
-          force_resort($link.parents('table'))
-        new_title: add_title_to_table
-      bubble:
-        upvote: (msg) ->
-          link_sel =
-            "ol a[data-id='" + msg.suggestion_id + "'].vote_up"
-          $link = $(link_sel)
-          $vote_count = $link.siblings('.vote_count').first()
-          update_votes(msg, $link, $vote_count)
-        new_title: add_title_to_bubble
-      clusters:
-        upvote: (msg) ->
-          $tr = $('tr[data-sg-id="' + msg.suggestion_id + '"]')
-          $tr.find('td.votes span.vote_count').text(msg.votes)
-
-          if !msg.cluster_id # suggestion does not belong to a cluster
-            $tr.find('td.cluster-votes').text(msg.cluster_votes)
-          else
-            # Update total cluster count
-            $toptr = $('#cluster-' + msg.cluster_id)
-            $toptr.find('td.cluster-votes').text(msg.cluster_votes)
-
-            # If the suggestion isn't already at the top of the cluster, and another
-            # title has overtaken its count as the top suggestion, we need to rebuild
-            # the cluster
-            is_sugg_already_top = msg.suggestion_id == $toptr.data('sg-id')
-            top_vote_count = $toptr.find('span.vote_count').text()
-            should_rebuild_cluster = msg.votes > top_vote_count
-
-            if !is_sugg_already_top && should_rebuild_cluster
-              rebuild_cluster(msg, $toptr)
-        new_title: add_title_to_cluster
-
-    # Dispatch message to handlers
-    try
-      dispatcher[view_mode][msg.action](msg)
-    catch err
-      # Deliberately avoiding a rethrow here since a bad msg is not a critical failure
-      console.log('ERROR: Something went wrong during socket msg dispatch.')
-      console.log(err)
-      console.log(raw_msg)
-      console.log('Check view mode and make sure action is registered with dispatcher.')
+init_live_mode = ->
+  hook_up_live_toggle()
+  toggle_live_mode_on()
 
 ############################################################
 # Message Handlers
