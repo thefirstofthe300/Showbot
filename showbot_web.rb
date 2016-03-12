@@ -13,7 +13,6 @@ require File.join(File.dirname(__FILE__), 'environment')
 
 
 SHOWS_JSON = File.expand_path(File.join(File.dirname(__FILE__), "public", "shows.json")) unless defined? SHOWS_JSON
-SAMPLE_TITLES_JSON = File.expand_path("hypercritical.json")
 
 class ShowbotWeb < Sinatra::Base
   configure do
