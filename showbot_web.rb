@@ -23,6 +23,7 @@ class ShowbotWeb < Sinatra::Base
     set :public_folder, "#{File.dirname(__FILE__)}/public"
     set :views, "#{File.dirname(__FILE__)}/views"
     set :shows, Shows.new { SHOWS_JSON }
+    set :live_mode_enabled, ENV['LIVE_MODE'] == "true"
   end
 
   configure(:production, :development) do
