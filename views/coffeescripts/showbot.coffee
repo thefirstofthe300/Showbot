@@ -234,6 +234,7 @@ add_title_to_cluster = (msg) ->
   else
     $('.suggestions_table tbody').append(msg.cluster.render)
 
+  refresh_timeago()
   increment_title_counts()
 
 ############################################################
