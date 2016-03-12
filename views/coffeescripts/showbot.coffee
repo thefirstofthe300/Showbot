@@ -259,7 +259,7 @@ increment_title_counts = ->
 
   increment_title($('#content h2.subtitle'))
   if is_cluster_mode
-    update_cluster_count()
+    update_cluster_title_count()
   else
     increment_title($('#titles .suggestions_table .total'))
 
@@ -283,7 +283,7 @@ init_cluster_arrow_handler = ($titles)->
       $tr.attr('data-expansion-state', new_state)
     )
 
-update_cluster_count = ->
+update_cluster_title_count = ->
   group_count = $('tr.cluster-top, tr[data-sg-id]').length
   title_count = $('tbody tr').length
 
