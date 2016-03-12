@@ -121,8 +121,19 @@ connect_to_socket = ->
           if !msg.cluster_id # suggestion does not belong to a cluster
             $tr.find('td.cluster-votes').text(msg.cluster_votes)
           else
-            $('#cluster-' + msg.cluster_id).find('td.cluster-votes')
-              .text(msg.cluster_votes)
+            # Update total cluster count
+            $toptr = $('#cluster-' + msg.cluster_id)
+            $toptr.find('td.cluster-votes').text(msg.cluster_votes)
+
+            # If the suggestion isn't already at the top of the cluster, and another
+            # title has overtaken its count as the top suggestion, we need to rebuild
+            # the cluster
+            is_sugg_already_top = msg.suggestion_id == $toptr.data('sg-id')
+            top_vote_count = $toptr.find('span.vote_count').text()
+            should_rebuild_cluster = msg.votes > top_vote_count
+
+            if !is_sugg_already_top && should_rebuild_cluster
+              rebuild_cluster(msg, $toptr)
         new_title: add_title_to_cluster
 
     # Dispatch message to handlers
@@ -294,3 +305,38 @@ update_cluster_title_count = ->
   count_str += ' in ' + group_count + ' Group'
 
   $('.suggestions_table .total').text(count_str)
+
+rebuild_cluster = (msg, $toptr) ->
+  child_sel = '.child-cluster-' + msg.cluster_id + '[data-sg-id="' + msg.suggestion_id + '"]'
+  $childtr = $(child_sel)
+
+  ############################################################
+  # SWAP OUT ROWS
+  # In practice, we're just swapping the relevant data.
+  # No need to reconstruct the table itself
+  ############################################################
+  # Suggestion ids
+  top_tr_id = $toptr.data('sg-id')
+  $toptr.data('sg-id', $childtr.data('sg-id'))
+  $childtr.data('sg-id', top_tr_id)
+
+  # Votes
+  $childtr.find('td span.vote_count').text($toptr.find('td span.vote_count').text())
+  $toptr.find('td span.vote_count').text(msg.votes)
+
+  # Titles
+  tmp_title = $toptr.find('td.title').text().trim()
+  $toptr.find('td.title').text($childtr.find('td.title').text().trim())
+  $childtr.find('td.title').text(tmp_title)
+
+  # User
+  tmp_user = $toptr.find('td.user').text().trim()
+  $toptr.find('td.user').text($childtr.find('td.user').text().trim())
+  $childtr.find('td.user').text(tmp_user)
+
+  # Time contents
+  top_time_contents = $toptr.find('td.time abbr.timeago').detach()
+  child_time_contents = $childtr.find('td.time abbr.timeago').detach()
+  $toptr.find('td.time').append(child_time_contents)
+  $childtr.find('td.time').append(top_time_contents)
+  ############################################################
