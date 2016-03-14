@@ -67,7 +67,7 @@ setup_voting = ->
           800 # 0.2 seconds less than animation due to hide
         )
 
-        update_votes(response, $link, $vote_count)
+        update_local_votes(response, $link, $vote_count)
 
     , "json").error(->
       $vote_count.removeClass('voted')
@@ -100,20 +100,20 @@ on_ws_message = (raw_msg) ->
   dispatcher =
     table:
       upvote: (msg)->
-        link_sel =
-          "tr[data-suggestion-id='" + msg.suggestion_id + "'] a.vote_up"
-        $link = $(link_sel)
-        $vote_count = $link.siblings('.vote_count').first()
-        update_votes(msg, $link, $vote_count)
-        force_resort($link.parents('table'))
+        vote_count_sel =
+          "tr[data-suggestion-id='" + msg.suggestion_id + "'] .vote_count"
+        $vote_count = $(vote_count_sel)
+        update_votes(msg, $vote_count)
+        force_resort($vote_count.closest('table'))
       new_title: add_title_to_table
     bubble:
       upvote: (msg) ->
+        # TODO: Fix this logic if the link isn't available!
         link_sel =
           "ol a[data-id='" + msg.suggestion_id + "'].vote_up"
         $link = $(link_sel)
         $vote_count = $link.siblings('.vote_count').first()
-        update_votes(msg, $link, $vote_count)
+        update_votes(msg, $vote_count)
       new_title: add_title_to_bubble
     clusters:
       upvote: (msg) ->
@@ -199,14 +199,7 @@ init_live_mode = ->
 # Message Handlers
 ############################################################
 
-update_votes = (response) ->
-  if arguments.length == 3
-    # Upvote originated locally
-    $link = arguments[1]
-    $vote_count = arguments[2]
-  else
-    # Live update branch
-
+update_local_votes = (response, $link, $vote_count) ->
   vote_amount = parseInt(response.votes)
   if isNaN(vote_amount)
     $vote_count.addClass('error')
@@ -220,6 +213,13 @@ update_votes = (response) ->
       .siblings('#cluster-' + response.cluster_id)
       .children('.cluster-votes')
       .text(response.cluster_votes)
+
+update_votes = (msg, $vote_count) ->
+  vote_amount = parseInt(msg.votes)
+  if isNaN(vote_amount)
+    $vote_count.addClass('error')
+  else
+    $vote_count.text(vote_amount)
 
 add_title_to_table = (msg) ->
   tbody_sel =
