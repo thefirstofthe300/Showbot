@@ -108,11 +108,9 @@ on_ws_message = (raw_msg) ->
       new_title: add_title_to_table
     bubble:
       upvote: (msg) ->
-        # TODO: Fix this logic if the link isn't available!
-        link_sel =
-          "ol a[data-id='" + msg.suggestion_id + "'].vote_up"
-        $link = $(link_sel)
-        $vote_count = $link.siblings('.vote_count').first()
+        vote_count_sel =
+          "ol .title_container[data-sg-id='" + msg.suggestion_id + "'] .vote_count"
+        $vote_count = $(vote_count_sel)
         update_votes(msg, $vote_count)
       new_title: add_title_to_bubble
     clusters:
