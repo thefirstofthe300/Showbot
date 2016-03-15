@@ -24,6 +24,7 @@ class ShowbotWeb < Sinatra::Base
     set :views, "#{File.dirname(__FILE__)}/views"
     set :shows, Shows.new { SHOWS_JSON }
     set :live_mode_enabled, ENV['LIVE_MODE'] == "true"
+    set :socket_key_id_enabled, ENV['SOCKET_KEY_ID'] == "true"
   end
 
   configure(:production, :development) do
@@ -355,14 +356,29 @@ class ShowbotWeb < Sinatra::Base
       status 400
     else
       request.websocket do |ws|
+        socket_key = settings.socket_key_id_enabled ?
+          request.env["HTTP_SEC_WEBSOCKET_KEY"] : request.ip
+
         ws.onopen do
           # Add client to manifest
-          settings.open_sockets[request.ip] = ws
+
+          if settings.open_sockets.key?(socket_key)
+            # NOTE: Need to protect against cases where we receive an onopen event
+            # and attempt to register a client with a key that already exists in
+            # our open socket manifest. If we just clober the entry without closing
+            # the socket, we leak the original handle. This allows the originally
+            # connected client to emit a close event and actuall disconnect the
+            # second client that connected. If we force close it, the original client
+            # cannot force all connections sharing it's key shut.
+            settings.open_sockets[socket_key].close_websocket
+          end
+
+          settings.open_sockets[socket_key] = ws
         end
 
         ws.onclose do
           # Cleanup after client disconnects
-          settings.open_sockets.delete(request.ip)
+          settings.open_sockets.delete(socket_key)
         end
 
         ########################################
