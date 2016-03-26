@@ -318,7 +318,6 @@ class ShowbotWeb < Sinatra::Base
   end
 
   def cluster_struct_for_suggestion(suggestion, request)
-        #.select{|sg| sg.id != suggestion.id }
     if suggestion.in_cluster?
       suggestion.cluster.suggestions
         .map do |sg|
@@ -381,22 +380,6 @@ class ShowbotWeb < Sinatra::Base
           settings.open_sockets.delete(socket_key)
         end
 
-        ########################################
-        # NOTE: No real need for the server to
-        # accept incomming socket messages. Upvotes
-        # continue to be delivered by standard AJAX
-        # and we'll just broadcast to hosts we're
-        # aware of that the event occurred.
-        ########################################
-        #ws.onmessage do |msg|
-          # Multicast
-          #EM.next_tick do
-            #settings.open_sockets.each do |k,v|
-              #if k == request.ip then next else v.send(msg.to_json) end
-            #end
-          #end
-        #end
-        ########################################
       end
     end
   end
