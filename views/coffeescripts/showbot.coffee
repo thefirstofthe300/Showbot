@@ -95,8 +95,6 @@ on_ws_message = (raw_msg) ->
     console.log('Got bad message, missing action')
     return
 
-  # TODO: Need to address the case where a new title is added and it's
-  # associated with a show that isn't already live.
   dispatcher =
     table:
       upvote: (msg)->
@@ -248,6 +246,15 @@ add_title_to_bubble = (msg) ->
   refresh_timeago()
 
 add_title_to_cluster = (msg) ->
+  table_sel = '.suggestions_table[data-show-slug="' + msg.show_slug + '"]'
+  $table = $(table_sel)
+
+  if $table.length == 0
+    # Got a new title for a show that doesn't already have a table. Easier
+    # to just force a page reload than to try to build out the render
+    location.reload()
+    return
+
   if msg.cluster.id # New title belongs to an existing cluster
     if msg.cluster.new_cluster
       # Suggestions added to the list that aren't already part of a cluster will be
@@ -260,7 +267,6 @@ add_title_to_cluster = (msg) ->
         $('tr.cluster-top#cluster-' + msg.cluster.id).children('td.title'))
     else
       # If this is not a new cluster, we should be able to find the existing one based on meta
-      # TODO: Respect sort order?
       old_tr_sel = "tr#cluster-" + msg.cluster.id + ",tr.child-cluster-" + msg.cluster.id
       $old_tr = $(old_tr_sel)
 
@@ -279,7 +285,10 @@ add_title_to_cluster = (msg) ->
       init_cluster_arrow_handler(
         $('tr.cluster-top#cluster-' + msg.cluster.id).children('td.title'))
   else
-    $('.suggestions_table tbody').append(msg.cluster.render)
+    if $table.length > 1
+      $table.first().find('tbody').append(msg.cluster.render)
+    else
+      $table.find('tbody').append(msg.cluster.render)
 
   refresh_timeago()
   increment_title_counts()

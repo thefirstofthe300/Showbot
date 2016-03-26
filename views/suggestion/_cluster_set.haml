@@ -2,7 +2,7 @@
   - suggestions = suggestion_set.suggestions
   .clear
   = suggestion_set_hr(suggestion_set)
-  .suggestions_table
+  .suggestions_table{"data-show-slug" => suggestion_set.slug}
     - group_count = suggestions.map { |s| s.cluster_id }.uniq.reject { |s| s == nil }.count + suggestions.count { |s| s.cluster_id == nil }
     .total=t(:titles, :scope => [:views, :suggestion, :_cluster_set], :count => suggestions.count) + t(:groups, :scope => [:views, :suggestion, :_cluster_set], :count => group_count)
     %table.sortable
