@@ -18,6 +18,7 @@ gem 'mail', '~> 2.5.0'
 
 # Web
 gem 'sinatra'
+gem 'sinatra-websocket'
 gem 'sinatra-reloader'
 gem 'thin'
 gem 'haml'
