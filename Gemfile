@@ -38,6 +38,7 @@ gem 'google-api-client'
 gem 'htmlentities'
 gem 'cinch-identify'
 gem 'stopwords', '0.2'
+gem 'droplet_kit'
 
 # Data Mapper
 gem 'data_mapper'
