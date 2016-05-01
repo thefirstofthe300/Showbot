@@ -2,11 +2,11 @@ require File.join(File.dirname(__FILE__), 'environment')
 
 require 'optparse'
 require 'cinchize'
-
+require 'droplet_kit'
 
 # Required to parse the cinchize.yml file properly
 if RUBY_VERSION < '1.9.3'
-  YAML::ENGINE.yamler = 'psych' 
+  YAML::ENGINE.yamler = 'psych'
 end
 
 Options = {
