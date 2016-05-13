@@ -15,6 +15,7 @@ module Cinch
       match /droplet\slist$/i,          :method => :command_droplet_list
       match /droplet\sstart\s(.+)/i,    :method => :command_droplet_start
       match /droplet\sstop\s(.+)/i,     :method => :command_droplet_stop
+      match /droplet\sshutdown\s(.+)/i, :method => :command_droplet_shutdown
 
       def initialize(*args)
         super
@@ -158,6 +159,20 @@ module Cinch
       end
 
       def command_droplet_stop(m, droplet_id)
+        if !authed? m.user
+          m.user.send 'You are not authorized for droplet access.'
+          return
+        end
+
+        begin
+          @do_client.droplet_actions.power_off(droplet_id: droplet_id)
+          m.user.send "Request to stop droplet #{droplet_id} succeeded!"
+        rescue
+          m.user.send 'An error occurred requesting the droplet to stop. Is your ID correct?'
+        end
+      end
+
+      def command_droplet_shutdown(m, droplet_id)
         if !authed? m.user
           m.user.send 'You are not authorized for droplet access.'
           return
