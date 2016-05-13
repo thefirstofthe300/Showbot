@@ -123,6 +123,10 @@ module Cinch
       # TODO: Error hardening
       # TODO: Force stop?
       ############################################################
+      def find_droplet_by_name(name)
+        @do_client.droplets.all.find { |droplet| droplet.name == name }
+      end
+
       def command_droplet_list(m)
         if !authed? m.user
           m.user.send 'You are not authorized for droplet access.'
@@ -135,7 +139,7 @@ module Cinch
 
         @do_client.droplets.all.each do |droplet|
           m.user.send "[#{droplet[:name]}]"
-          m.user.send "  id: #{droplet[:id]}"
+#          m.user.send "  id: #{droplet[:id]}"
           m.user.send "  status: #{droplet[:status]}"
         end
 
@@ -144,43 +148,43 @@ module Cinch
         m.user.send '=============================='
       end
 
-      def command_droplet_start(m, droplet_id)
+      def command_droplet_start(m, name)
         if !authed? m.user
           m.user.send 'You are not authorized for droplet access.'
           return
         end
 
         begin
-          @do_client.droplet_actions.power_on(droplet_id: droplet_id)
-          m.user.send "Request to start droplet #{droplet_id} succeeded!"
+          @do_client.droplet_actions.power_on(droplet_id: find_droplet_by_name(name).id)
+          m.user.send "Request to start droplet #{name} succeeded!"
         rescue
           m.user.send 'An error occurred requesting the droplet to start. Is your ID correct?'
         end
       end
 
-      def command_droplet_stop(m, droplet_id)
+      def command_droplet_stop(m, name)
         if !authed? m.user
           m.user.send 'You are not authorized for droplet access.'
           return
         end
 
         begin
-          @do_client.droplet_actions.power_off(droplet_id: droplet_id)
-          m.user.send "Request to stop droplet #{droplet_id} succeeded!"
+          @do_client.droplet_actions.power_off(droplet_id: find_droplet_by_name(name).id)
+          m.user.send "Request to stop droplet #{name} succeeded!"
         rescue
           m.user.send 'An error occurred requesting the droplet to stop. Is your ID correct?'
         end
       end
 
-      def command_droplet_shutdown(m, droplet_id)
+      def command_droplet_shutdown(m, name)
         if !authed? m.user
           m.user.send 'You are not authorized for droplet access.'
           return
         end
 
         begin
-          @do_client.droplet_actions.shutdown(droplet_id: droplet_id)
-          m.user.send "Request to stop droplet #{droplet_id} succeeded!"
+          @do_client.droplet_actions.shutdown(droplet_id: find_droplet_by_name(name).id)
+          m.user.send "Request to stop droplet #{name} succeeded!"
         rescue
           m.user.send 'An error occurred requesting the droplet to stop. Is your ID correct?'
         end
