@@ -153,7 +153,7 @@ module Cinch
           @do_client.droplet_actions.power_on(droplet_id: droplet_id)
           m.user.send "Request to start droplet #{droplet_id} succeeded!"
         rescue
-          m.user.send 'An error occurred requesting the droplet to stop. Is your ID correct?'
+          m.user.send 'An error occurred requesting the droplet to start. Is your ID correct?'
         end
       end
 
