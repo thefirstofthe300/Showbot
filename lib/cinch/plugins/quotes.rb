@@ -15,7 +15,7 @@ module Cinch
       end
 
       def command_quote(m, name)
-        if name.start_with?("add ","del ", "alias ") || name == "dump"
+        if name.start_with?("add ","del ", "alias ")
           m.user.send("You have to be an admin to use that command.") and return unless authed? m.user
 
           command = name.split(" ")
@@ -24,8 +24,6 @@ module Cinch
             add_quote(m, command)
           when "del"
             del_quote(m, command)
-          when "dump"
-            debug @quote_list.quotes.to_s
           when "alias"
             m.user.send("Alias commands require four arguments.") and return if command.length != 4
             case command[1]
