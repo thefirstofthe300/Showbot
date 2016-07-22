@@ -45,13 +45,24 @@ module Cinch
       def add_quote(m, command)
         m.user.send("I need more arguments for that command.") and return if command.length < 3
         @quote_list.add(command[1], command[2..-1].join(" "))
+        save_to_disk
         m.reply("Quote added!")
       end
 
       def del_quote(m, command)
         m.user.send("I need more arguments for that command.") and return if command.length < 3
         @quote_list.del(command[1], command[2..-1].join(" "))
+        save_to_disk
         m.reply("Quote added!")
+      end
+
+      def save_to_disk
+        if !config[:quotes_file].nil?
+          quotes_path = File.join File.dirname(__FILE__), "../../../#{config[:quotes_file]}"
+          File.open(quotes_path, "w") {|file| file.write(@quote_list.quotes.to_yaml)}
+        else
+          User(shared[:owner]).send("Couldn't save quotes file; no location specified in config.")
+        end
       end
 
       def authed?(user)
