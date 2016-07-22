@@ -21,7 +21,7 @@ module Cinch
       end
 
       def command_quote(m, name)
-        if name.include? " "
+        if name.start_with?("add ","del ") || name == "dump"
           m.user.send("You have to be an admin to use that command.") and return unless authed? m.user
 
           command = name.split(" ")
@@ -32,8 +32,6 @@ module Cinch
             del_quote(m, command)
           when "dump"
             info @quote_list.quotes.to_s
-          else
-            m.reply("#{shared[:Bot_Nick]} doesn't know that verb.")
           end
         else
           m.reply @quote_list.quote_for name

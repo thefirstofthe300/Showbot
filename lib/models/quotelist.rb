@@ -20,6 +20,7 @@ class QuoteList
     canonical_name = canonicalize name
     return '' if !canonical_name
     @quotes[canonical_name][:quotes].delete(quote)
+    @quotes.delete(canonical_name) if @quotes[canonical_name][:quotes].length == 0
   end
 
   private
