@@ -13,7 +13,11 @@ class QuoteList
   def add(name, quote)
     name.downcase!
     @quotes[name] ||= {aliases:[], quotes:[]}
-    @quotes[name][:quotes] << quote
+    if @quotes[name][:quotes].select {|q| q.downcase == quote.downcase} == []
+      @quotes[name][:quotes] << quote
+    else
+      ''
+    end
   end
 
   def del(name, quote)
@@ -21,6 +25,18 @@ class QuoteList
     return '' if !canonical_name
     @quotes[canonical_name][:quotes].delete(quote)
     @quotes.delete(canonical_name) if @quotes[canonical_name][:quotes].length == 0
+  end
+
+  def add_alias(name, a)
+    canonical_name = canonicalize name
+    return '' if !canonical_name
+    @quotes[canonical_name][:aliases] << a
+  end
+
+  def del_alias(name, a)
+    canonical_name = canonicalize name
+    return '' if !canonical_name
+    @quotes[canonical_name][:aliases].delete(a)
   end
 
   private
