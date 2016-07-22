@@ -11,8 +11,7 @@ class QuoteList
   end
 
   def add(name, quote)
-    canonical_name = canonicalize name
-    return '' if !canonical_name
+    name.downcase!
     @quotes[canonical_name][:quotes] << quote
   end
 
