@@ -12,7 +12,7 @@ class QuoteList
 
   def add(name, quote)
     name.downcase!
-    @quotes[canonical_name][:quotes] << quote
+    @quotes[name][:quotes] << quote
   end
 
   def del(name, quote)
