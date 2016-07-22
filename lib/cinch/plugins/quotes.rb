@@ -21,7 +21,7 @@ module Cinch
       end
 
       def command_quote(m, name)
-        if name.start_with?("add ","del ") || name == "dump"
+        if name.start_with?("add ","del ", "alias ") || name == "dump"
           m.user.send("You have to be an admin to use that command.") and return unless authed? m.user
 
           command = name.split(" ")
@@ -31,7 +31,15 @@ module Cinch
           when "del"
             del_quote(m, command)
           when "dump"
-            info @quote_list.quotes.to_s
+            debug @quote_list.quotes.to_s
+          when "alias"
+            m.user.send("Alias commands require four arguments.") and return if command.length != 4
+            case command[1]
+            when "add"
+              add_alias(m, command)
+            when "del"
+              del_alias(m, command)
+            end
           end
         else
           m.reply @quote_list.quote_for name
@@ -52,6 +60,18 @@ module Cinch
         @quote_list.del(command[1], command[2..-1].join(" "))
         save_to_disk
         m.reply("Quote removed!")
+      end
+
+      def add_alias(m, command)
+        @quote_list.add_alias(command[2], command[3])
+        save_to_disk
+        m.reply("Alias added!")
+      end
+
+      def del_alias(m, command)
+        @quote_list.del_alias(command[2], command[3])
+        save_to_disk
+        m.reply("Alias removed!")
       end
 
       def save_to_disk
