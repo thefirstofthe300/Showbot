@@ -15,10 +15,21 @@ module Cinch
         else
           @quote_list = QuoteList.new(config)
         end
+        @owner_nick = shared[:owner]
+        @has_ns = shared[:server_has_nickserv]
+        @allow_op_msgs = shared[:allow_op_msgs]
       end
 
       def command_quote(m, name)
         m.reply @quote_list.quote_for name
+      end
+
+      def authed?(user)
+        if @allow_op_msgs
+          (user.nick == @owner_nick || user.oper?) && (user.authed? || !@has_ns)
+        else
+          user.nick == @owner_nick && (user.authed? || !@has_ns)
+        end
       end
     end
   end
