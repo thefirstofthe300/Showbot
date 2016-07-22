@@ -8,13 +8,7 @@ module Cinch
 
       def initialize(*args)
         super
-        if !config[:quotes_file].nil?
-          quotes_path = File.join File.dirname(__FILE__), "../../../#{config[:quotes_file]}"
-          quotes_yaml = YAML.load_file quotes_path
-          @quote_list = QuoteList.new quotes_yaml
-        else
-          @quote_list = QuoteList.new(config)
-        end
+        @quote_list = QuoteList.new(config)
         @owner_nick = shared[:owner]
         @has_ns = shared[:server_has_nickserv]
         @allow_op_msgs = shared[:allow_op_msgs]
@@ -51,36 +45,23 @@ module Cinch
       def add_quote(m, command)
         m.user.send("I need more arguments for that command.") and return if command.length < 3
         @quote_list.add(command[1], command[2..-1].join(" "))
-        save_to_disk
         m.reply("Quote added!")
       end
 
       def del_quote(m, command)
         m.user.send("I need more arguments for that command.") and return if command.length < 3
         @quote_list.del(command[1], command[2..-1].join(" "))
-        save_to_disk
         m.reply("Quote removed!")
       end
 
       def add_alias(m, command)
         @quote_list.add_alias(command[2], command[3])
-        save_to_disk
         m.reply("Alias added!")
       end
 
       def del_alias(m, command)
         @quote_list.del_alias(command[2], command[3])
-        save_to_disk
         m.reply("Alias removed!")
-      end
-
-      def save_to_disk
-        if !config[:quotes_file].nil?
-          quotes_path = File.join File.dirname(__FILE__), "../../../#{config[:quotes_file]}"
-          File.open(quotes_path, "w") {|file| file.write(@quote_list.quotes.to_yaml)}
-        else
-          User(shared[:owner]).send("Couldn't save quotes file; no location specified in config.")
-        end
       end
 
       def authed?(user)
