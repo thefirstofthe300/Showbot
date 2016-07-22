@@ -53,7 +53,7 @@ module Cinch
         m.user.send("I need more arguments for that command.") and return if command.length < 3
         @quote_list.del(command[1], command[2..-1].join(" "))
         save_to_disk
-        m.reply("Quote added!")
+        m.reply("Quote removed!")
       end
 
       def save_to_disk
