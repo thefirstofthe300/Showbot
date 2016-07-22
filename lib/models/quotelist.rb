@@ -12,6 +12,7 @@ class QuoteList
 
   def add(name, quote)
     name.downcase!
+    @quotes[name] ||= {aliases:[], quotes:[]}
     @quotes[name][:quotes] << quote
   end
 

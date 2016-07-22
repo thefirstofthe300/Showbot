@@ -21,7 +21,7 @@ module Cinch
       end
 
       def command_quote(m, name)
-        if name.includes? " "
+        if name.include? " "
           m.user.send("You have to be an admin to use that command.") and return unless authed? m.user
 
           command = name.split(" ")
@@ -30,6 +30,8 @@ module Cinch
             add_quote(m, command)
           when "del"
             del_quote(m, command)
+          when "dump"
+            info @quote_list.quotes.to_s
           else
             m.reply("#{shared[:Bot_Nick]} doesn't know that verb.")
           end
@@ -43,11 +45,13 @@ module Cinch
       def add_quote(m, command)
         m.user.send("I need more arguments for that command.") and return if command.length < 3
         @quote_list.add(command[1], command[2..-1].join(" "))
+        m.reply("Quote added!")
       end
 
       def del_quote(m, command)
         m.user.send("I need more arguments for that command.") and return if command.length < 3
         @quote_list.del(command[1], command[2..-1].join(" "))
+        m.reply("Quote added!")
       end
 
       def authed?(user)
