@@ -9,6 +9,18 @@ class QuoteList
     @quotes[canonical_name][:quotes].sample
   end
 
+  def add(name, quote)
+    canonical_name = canonicalize name
+    return '' if !canonical_name
+    @quotes[canonical_name][:quotes] << quote
+  end
+
+  def del(name, quote)
+    canonical_name = canonicalize name
+    return '' if !canonical_name
+    @quotes[canonical_name][:quotes].delete(quote)
+  end
+
   private
 
   def canonicalize(name)
