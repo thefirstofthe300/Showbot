@@ -1,4 +1,5 @@
 class QuoteList
+  attr_reader :quotes
   def initialize(quotes)
     @quotes = quotes
   end
