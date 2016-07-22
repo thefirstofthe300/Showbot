@@ -2,7 +2,7 @@ class QuoteList
   def initialize(config)
     unless config[:quotes_file].nil?
       @quotes_path = File.join File.dirname(__FILE__), "../../../#{config[:quotes_file]}"
-      @quotes = YAML.load_file quotes_path
+      @quotes = YAML.load_file @quotes_path
       @can_save = true
     else
       warn "Quotes file was nil. QUOTE CHANGES WILL NOT BE SAVED!"
