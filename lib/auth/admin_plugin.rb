@@ -1,4 +1,4 @@
-module JB
+module Auth
   module AdminPlugin
     UNREGISTERED_MSG = "You must be registered to execute admin commands!"
     UNAUTHORIZED_MSG = "You are not authorized to execute that command! I will now self destruct."
@@ -55,7 +55,7 @@ module JB
     private
 
     def self.mangled_method_name(options)
-      "__jb_admin_#{options[:method]}".to_sym
+      "__auth_admin_#{options[:method]}".to_sym
     end
 
     def self.is_admin?(user)

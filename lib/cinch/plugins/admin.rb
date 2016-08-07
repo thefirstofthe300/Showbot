@@ -3,7 +3,7 @@
 module Cinch
   module Plugins
     class Admin
-      include JB::AdminPlugin
+      include Auth::AdminPlugin
 
       [{
         :pattern => /(?:exit|quit)/i,

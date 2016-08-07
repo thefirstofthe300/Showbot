@@ -1,7 +1,7 @@
 module Cinch
   module Plugins
     class DigitalOcean
-      include JB::AdminPlugin
+      include Auth::AdminPlugin
 
       DO_UNAUTHORIZED_MSG = 'You are not authorized for droplet access.'
 

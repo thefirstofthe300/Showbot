@@ -7,7 +7,7 @@ live_hosts: &live_hosts
   Live_Url: "example.com/live"
   Sinatra_Url: "http://www.example.com"
 
-jb_admin:
+auth_admin:
   admins:
     - "ChrisLAS"
     - "KernelLinux"

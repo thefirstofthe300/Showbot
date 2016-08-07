@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'environment')
 require 'optparse'
 require 'cinchize'
 require 'droplet_kit'
-require 'jb/admin_plugin'
+require 'auth/admin_plugin'
 
 # Required to parse the cinchize.yml file properly
 if RUBY_VERSION < '1.9.3'
@@ -20,7 +20,7 @@ Options = {
 
 options = Options.dup
 
-JB::AdminPlugin.init(YAML.load_file(Options[:local_config])['jb_admin']['admins'])
+Auth::AdminPlugin.init(YAML.load_file(Options[:local_config])['auth_admin']['admins'])
 
 daemon = Cinchize::Cinchize.new *Cinchize.config(options, ARGV.first)
 daemon.send options[:action]
