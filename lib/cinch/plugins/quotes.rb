@@ -46,22 +46,22 @@ module Cinch
 
       private
 
-      def command_add_quote(m, name, quote)
+      def command_quote_add(m, name, quote)
         @quote_list.add(name, quote)
         m.reply("Quote added!")
       end
 
-      def command_del_quote(m, name, quote)
+      def command_quote_del(m, name, quote)
         @quote_list.del(name, quote)
         m.reply("Quote removed!")
       end
 
-      def command_add_alias(m, original, alias_name)
+      def command_alias_add(m, original, alias_name)
         @quote_list.add_alias(original, alias_name)
         m.reply("Alias added!")
       end
 
-      def command_del_alias(m, original, alias_name)
+      def command_alias_del(m, original, alias_name)
         @quote_list.del_alias(original, alias_name)
         m.reply("Alias removed!")
       end
