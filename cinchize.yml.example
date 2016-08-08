@@ -99,9 +99,6 @@ servers:
     shared:
       Bot_Nick: "botname"
       Backup_Bot_Nick: "botname-backup"
-      :allow_op_msgs: true # Allow chanops to administer certain plugins?
-      :owner: "" # Who owns the bot?
-      :server_has_nickserv: true # Does this server have nick registering methods available?
       <<: *test_hosts
   network_live:
     <<: *network_base
