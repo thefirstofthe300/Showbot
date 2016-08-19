@@ -1,4 +1,6 @@
 [![Stories in Ready](https://badge.waffle.io/rikai/Showbot.png?label=ready&title=Ready)](https://waffle.io/rikai/Showbot)
+[![Code Climate](https://codeclimate.com/github/rikai/Showbot/badges/gpa.svg)](https://codeclimate.com/github/rikai/Showbot)
+[![Issue Count](https://codeclimate.com/github/rikai/Showbot/badges/issue_count.svg)](https://codeclimate.com/github/rikai/Showbot)
 # JBot
 
 A sweet IRC bot with a **web interface** for [Jupiter Broadcasting](http://www.jupiterbroadcasting.com/).
