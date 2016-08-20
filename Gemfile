@@ -58,7 +58,6 @@ group :development do
   gem 'dm-sqlite-adapter'
   gem 'foreman'
   gem 'rb-fsevent'
-  gem 'irbtools-more'
 end
 
 group :test do
