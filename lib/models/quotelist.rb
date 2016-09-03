@@ -2,7 +2,7 @@ class QuoteList
   def initialize(config)
     unless config[:quotes_file].nil?
       @quotes_path = File.join File.dirname(__FILE__), "../../#{config[:quotes_file]}"
-	  @can_save = true
+      @can_save = true
       begin
         @quotes = YAML.load_file @quotes_path
       rescue Errno::ENOENT
