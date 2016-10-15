@@ -65,6 +65,16 @@ plugins: &plugins
           <<: *test_hosts
         live_hosts:
           <<: *live_hosts
+   -
+    class: "Cinch::Plugins::TStream"
+    options:
+      :users: ["user1", "user2"] # This can be a single user, or an array of Twitter users
+      # To get these values, you will need to register as a developer with Twitter
+      :consumer_key: "YOURCONSUMERKEYHERE"
+      :consumer_secret: "YOURCONSUMERSECRETHERE"
+      :oauth_token: "YOURTOKENHERE"
+      :oauth_token_secret: "YOURTOKENSECRETHERE"
+      :channel: "#testchannel"
   -
     class: "Cinch::Plugins::Twitter"
     options:
