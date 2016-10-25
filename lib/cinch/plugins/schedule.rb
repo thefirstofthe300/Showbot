@@ -27,7 +27,7 @@ module Cinch
       def help_next
         [
           '!next - When\'s the next live show?',
-          'Usage: !next [show]'
+          'Usage: !next [show] [-t <TZ timezone>]'
         ].join "\n"
       end
 
