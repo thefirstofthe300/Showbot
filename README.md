@@ -57,6 +57,9 @@ You also need to set up your `cinchize.yml` file. Copy `cinchize.yml.example` to
 lines related to that plugin in `cinchize.yml`. Don't forget to also update the
 connection settings and your bot's name.
 
+*NOTE:* If you choose to configure a plugin it _MUST_ be disabled, otherwise the
+bot will fail to start.
+
 Lastly, you will need to create a `data.json` file. This file can be hosted by
 JBot's web server by putting it into `public/`, or can be hosted externally by
 setting the `DATA_JSON_URL` variable in `.env` to the URL. To learn more about
