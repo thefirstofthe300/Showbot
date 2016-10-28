@@ -7,7 +7,7 @@ plugins: &plugins
   -
     class: "Cinch::Plugins::Admin"
     options:
-      :data_json: "local/path/to/data.json"
+      :data_json: "local/path/to/data.json" # Local path, relative to the base bot folder
       :admins:
         - "YourNickHere"
   -
