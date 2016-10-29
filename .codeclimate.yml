@@ -18,7 +18,13 @@ engines:
     enabled: true
   fixme:
     enabled: true
+  markdownlint:
+    enabled: true
+  reek:
+    enabled: true
   rubocop:
+    enabled: true
+  scss-lint:
     enabled: true
 ratings:
   paths:
@@ -28,6 +34,7 @@ ratings:
   - "**.inc"
   - "**.js"
   - "**.jsx"
+  - "**.md"
   - "**.module"
   - "**.php"
   - "**.py"
