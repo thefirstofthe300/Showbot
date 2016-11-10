@@ -1,4 +1,4 @@
-# A Cinch plugin for using Twitter's streaming API to send tweets to an IRC channel
+# A Cinch plugin for streaming Twitter updates to an IRC channel
 require 'tweetstream'
 
 module Cinch
@@ -49,20 +49,20 @@ module Cinch
         @users = Array(config[:users])
         @rest_twitter = init_rest_twitter
         ids = []
-
         @users.each do |z|
           ids.push(@rest_twitter.user(z).id)
         end
+        ids = ids.join(',')
 
         client = ::TweetStream::Client.new
-        ids = ids.join(',')
         Thread.new do
           client.follow(ids) do |status|
-            if tweet.reply?
-              next
-            else
-              Channel(@channel).send  "[Twitter] @#{status.user.screen_name}: #{status.text}"
+            if ids.include?(status.user.id.to_s) && status.in_reply_to_status_id.nil? && status.in_reply_to_screen_name.nil?
+              Channel(@channel).send "[Twitter] @#{status.user.screen_name}: #{status.text}"
             end
+          end
+          client.on_error do |message|
+            puts "Error: #{message}"
           end
         end
 #        bot.loggers.debug "boop"
