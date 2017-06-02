@@ -7,7 +7,7 @@ plugins: &plugins
   -
     class: "Cinch::Plugins::Admin"
     options:
-      :data_json: "local/path/to/data.json"
+      :data_json: "local/path/to/data.json" # Local path, relative to the base bot folder
       :admins:
         - "YourNickHere"
   -
@@ -80,6 +80,12 @@ servers:
       Backup_Bot_Nick: "botname-backup"
       Live_Url: "localhost:5000/live"
       Sinatra_Url: "http://localhost:5000"
+      # This controls Cinch::Cooldown.
+      :cooldown:
+        :config:
+          :linux:
+            :global: 2
+            :user: 4
   network_live:
     <<: *network_base
     nick: botname
