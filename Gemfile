@@ -10,7 +10,7 @@ gem 'dotenv'
 
 # Backups
 gem 'backup'
-gem 'fog', '~> 1.9.0'
+gem 'fog'
 gem 'whenever', require: false
 gem 'net-ssh', ['>= 2.3.0', '<= 2.5.2']
 gem 'excon', '~> 0.17.0'
@@ -19,6 +19,7 @@ gem 'mail', '~> 2.5.0'
 # Web
 gem 'sinatra'
 gem 'sinatra-reloader'
+gem 'sinatra-websocket'
 gem 'thin'
 gem 'haml'
 gem 'sass'
@@ -32,12 +33,14 @@ gem 'cinch'
 gem 'cinchize'
 gem 'chronic'
 gem 'chronic_duration'
-gem 'twitter'
-gem 'google-api-client'
+gem 'tweetstream'
+gem 'google-api-client', '<0.9'
 gem 'htmlentities'
 gem 'cinch-identify'
 gem 'cinch-cooldown', '>= 1.2.0'
 gem 'stopwords', '0.2'
+gem 'droplet_kit'
+gem 'nokogiri', '>= 1.6.8'
 
 # Data Mapper
 gem 'data_mapper'
