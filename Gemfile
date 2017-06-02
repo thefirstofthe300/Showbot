@@ -36,6 +36,7 @@ gem 'twitter'
 gem 'google-api-client'
 gem 'htmlentities'
 gem 'cinch-identify'
+gem 'cinch-cooldown', '>= 1.2.0'
 gem 'stopwords', '0.2'
 
 # Data Mapper
@@ -58,7 +59,6 @@ group :development do
   gem 'dm-sqlite-adapter'
   gem 'foreman'
   gem 'rb-fsevent'
-  gem 'irbtools-more'
 end
 
 group :test do
