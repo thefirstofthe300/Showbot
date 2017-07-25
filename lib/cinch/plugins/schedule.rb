@@ -1,3 +1,4 @@
+require 'cinch/cooldown'
 require 'optparse'
 require 'tzinfo'
 
@@ -8,6 +9,8 @@ module Cinch
   module Plugins
     class Schedule
       include Cinch::Plugin
+
+      enforce_cooldown
 
       timer 600, :method => :refresh_calendar
 
@@ -27,7 +30,7 @@ module Cinch
       def help_next
         [
           '!next - When\'s the next live show?',
-          'Usage: !next [show]'
+          'Usage: !next [show] [-t <TZ timezone>]'
         ].join "\n"
       end
 

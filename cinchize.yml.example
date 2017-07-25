@@ -101,6 +101,14 @@ servers:
     shared:
       Bot_Nick: "botname"
       Backup_Bot_Nick: "botname-backup"
+      Live_Url: "localhost:5000/live"
+      Sinatra_Url: "http://localhost:5000"
+      # This controls Cinch::Cooldown.
+      :cooldown:
+        :config:
+          :linux:
+            :global: 2
+            :user: 4
       <<: *test_hosts
   network_live:
     <<: *network_base

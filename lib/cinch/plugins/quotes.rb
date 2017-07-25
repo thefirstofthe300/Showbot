@@ -1,7 +1,11 @@
+require 'cinch/cooldown'
+
 module Cinch
   module Plugins
     class Quotes
       include Auth::AdminPlugin
+
+      enforce_cooldown
 
       match /quote\s+(.+)/i, :method => :command_quote
       match /([^\s]+)/i,     :method => :command_quote
