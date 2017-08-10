@@ -16,6 +16,10 @@ gem 'net-ssh', ['>= 2.3.0', '<= 2.5.2']
 gem 'excon', '~> 0.17.0'
 gem 'mail', '~> 2.5.0'
 
+# Discord
+gem 'discordrb'
+gem 'rest-client', '~> 2.0.2'
+
 # Web
 gem 'sinatra'
 gem 'sinatra-reloader'
