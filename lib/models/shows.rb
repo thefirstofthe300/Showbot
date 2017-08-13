@@ -4,8 +4,6 @@ require 'json'
 
 require './lib/models/show.rb'
 
-SHOWS_JSON = "#{Dir.pwd}/public/shows.json"
-
 class Shows
   def initialize(show_hashes)
     @shows = []
