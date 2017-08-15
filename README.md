@@ -1,6 +1,6 @@
 [![Stories in Ready](https://badge.waffle.io/rikai/Showbot.png?label=ready&title=Ready)](https://waffle.io/rikai/Showbot)
-# JBot
 [![Build Status](https://travis-ci.org/rikai/Showbot.svg?branch=master)](https://travis-ci.org/rikai/Showbot)
+# JBot
 
 A sweet IRC bot with a **web interface** for [Jupiter Broadcasting](http://www.jupiterbroadcasting.com/).
 Built on [cinch](https://github.com/cinchrb/cinch) and [sinatra](http://www.sinatrarb.com/). It is a fork/evolution of
