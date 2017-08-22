@@ -5,6 +5,8 @@ require 'json'
 require './lib/models/show.rb'
 
 class Shows
+  attr_reader :shows
+
   def initialize(show_hashes)
     @shows = []
     if show_hashes.length > 0
@@ -18,15 +20,15 @@ class Shows
       @shows.push Show.new(show_hash)
     end
   end
-  
-  def get_shows
-    @shows
-  end
 
+  def remove(show)
+    @shows.delete(find_show(show))
+  end
+  
   # Returns the first show that matches the given keyword; 
   # otherwise, returns nil.
   def find_show(keyword)
-    if !keyword
+    if !keyword or keyword == ''
       return nil
     end
     
