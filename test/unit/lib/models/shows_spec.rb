@@ -36,7 +36,6 @@ describe Shows do
     }]
     @shows.load(new_show)
     expect(@shows.shows.length).to eq 2
-    puts @shows.shows[1].class
     expect(@shows.shows[1].class).to eq Show
     expect(@shows.shows[1]).to have_attributes(:rss => new_show[0]['rss'], :url => new_show[0]['url'], :title => new_show[0]['title'], :aliases => ["linuxas", "lashow"])
   end

@@ -105,4 +105,4 @@ namespace :api_key do
   end
 end
 
-task :default => ["spec:unit", "spec:acceptance"]
+task :default => ["spec:unit"]
