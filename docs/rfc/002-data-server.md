@@ -146,6 +146,7 @@ and Ruby.
 Pros:
 - Already used for the existing IRC bot
 - Development language of choice for Rikai
+- ??? (I don't know enough about Ruby to say what other pros it has)
 
 Cons:
 - Can be difficult to ship the application to a new server due to dependencies
@@ -164,8 +165,7 @@ Cons:
 
 #### Go considerations
 Pros:
-- Fast language
-- Statically-typed
+- Fast, lightweight, and statically-typed
 - Simple language to learn and use
 - Get a [highly performant HTTP server stack](https://golang.org/pkg/net/http/) 
 for free
